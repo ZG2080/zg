@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZG Almacén</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --verde: #2d6a4f;
+      --verde-claro: #52b788;
+      --verde-suave: #d8f3dc;
+      --blanco: #ffffff;
+      --gris: #f4f4f0;
+      --texto: #1b1b1b;
+      --sombra: rgba(45,106,79,0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--gris);
+      color: var(--texto);
+    }
+
+    /* HEADER */
+    header {
+      background: var(--verde);
+      color: var(--blanco);
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px var(--sombra);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo span {
+      background: var(--verde-claro);
+      color: var(--verde);
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    nav a {
+      color: var(--blanco);
+      text-decoration: none;
+      margin-left: 1.5rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+    nav a:hover { opacity: 1; }
+
+    .carrito-btn {
+      background: var(--verde-claro);
+      color: var(--verde);
+      border: none;
+      border-radius: 25px;
+      padding: 0.4rem 1.1rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .carrito-btn:hover { background: #74c69d; transform: scale(1.04); }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, var(--verde) 0%, var(--verde-claro) 100%);
+      color: var(--blanco);
+      text-align: center;
+      padding: 4rem 2rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 280px; height: 280px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -40px;
+      width: 220px; height: 220px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      margin-bottom: 0.7rem;
+      animation: fadeDown 0.7s ease both;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      max-width: 500px;
+      margin: 0 auto 1.8rem;
+      animation: fadeDown 0.9s ease both;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 25px;
+      padding: 0.4rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      animation: fadeDown 1.1s ease both;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CATEGORIAS */
+    .categorias {
+      display: flex;
+      gap: 0.7rem;
+      padding: 1.5rem 2rem;
+      overflow-x: auto;
+      background: var(--blanco);
+      border-bottom: 1px solid #e0e0d8;
+    }
+
+    .cat-btn {
+      background: var(--verde-suave);
+      color: var(--verde);
+      border: none;
+      border-radius: 20px;
+      padding: 0.4rem 1.1rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s;
+    }
+    .cat-btn.active, .cat-btn:hover {
+      background: var(--verde);
+      color: var(--blanco);
+    }
+
+    /* PRODUCTOS */
+    .seccion-titulo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--verde);
+      padding: 2rem 2rem 0.5rem;
+    }
+
+    .productos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.2rem;
+      padding: 1rem 2rem 2rem;
+    }
+
+    .producto-card {
+      background: var(--blanco);
+      border-radius: 16px;
+      box-shadow: 0 2px 12px var(--sombra);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: fadeUp 0.5s ease both;
+    }
+    .producto-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px var(--sombra);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .producto-img {
+      width: 100%;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      background: var(--verde-suave);
+    }
+
+    .producto-info {
+      padding: 0.9rem;
+    }
+
+    .producto-nombre {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+      color: var(--texto);
+    }
+
+    .producto-desc {
+      font-size: 0.78rem;
+      color: #666;
+      margin-bottom: 0.6rem;
+    }
+
+    .producto-precio {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--verde);
+      margin-bottom: 0.7rem;
+    }
+
+    .btn-agregar {
+      width: 100%;
+      background: var(--verde);
+      color: var(--blanco);
+      border: none;
+      border-radius: 10px;
+      padding: 0.5rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-agregar:hover { background: var(--verde-claro); color: var(--verde); transform: scale(1.02); }
+
+    /* CARRITO MODAL */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .overlay.open { display: flex; }
+
+    .carrito-panel {
+      background: var(--blanco);
+      width: 100%;
+      max-width: 480px;
+      border-radius: 20px 20px 0 0;
+      padding: 1.5rem;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+
+    .carrito-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .carrito-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--verde);
+    }
+
+    .cerrar-btn {
+      background: var(--verde-suave);
+      border: none;
+      border-radius: 50%;
+      width: 34px; height: 34px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: var(--verde);
+      font-weight: 700;
+    }
+
+    .carrito-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .carrito-item-emoji { font-size: 2rem; }
+
+    .carrito-item-info { flex: 1; }
+    .carrito-item-nombre { font-weight: 700; font-size: 0.9rem; }
+    .carrito-item-precio { color: var(--verde); font-weight: 600; font-size: 0.85rem; }
+
+    .carrito-item-controles {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ctrl-btn {
+      background: var(--verde-suave);
+      border: none;
+      border-radius: 8px;
+      width: 28px; height: 28px;
+      font-size: 1rem;
+      cursor: pointer;
+      color: var(--verde);
+      font-weight: 700;
+    }
+
+    .ctrl-btn:hover { background: var(--verde); color: white; }
+
+    .cant { font-weight: 700; min-width: 20px; text-align: center; }
+
+    .carrito-total {
+      margin-top: 1rem;
+      text-align: right;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--verde);
+      font-weight: 700;
+    }
+
+    .btn-pedido {
+      margin-top: 1rem;
+      width: 100%;
+      background: #25d366;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.8rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .btn-pedido:hover { background: #1ebe5d; }
+
+    .carrito-vacio {
+      text-align: center;
+      color: #aaa;
+      padding: 2rem 0;
+      font-size: 0.95rem;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--verde);
+      color: rgba(255,255,255,0.85);
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.88rem;
+      margin-top: 2rem;
+    }
+
+    footer strong { color: white; }
+
+    @media (max-width: 600px) {
+      .productos-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; padding: 1rem; }
+      nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <span>🛒</span> ZG
+  </div>
+  <nav>
+    <a href="#">Inicio</a>
+    <a href="#">Productos</a>
+    <a href="https://wa.me/541133869762" target="_blank">Contacto</a>
+  </nav>
+  <button class="carrito-btn" onclick="abrirCarrito()">
+    🛒 Carrito <span id="carrito-count">0</span>
+  </button>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>ZG Almacén</h1>
+  <p>Todo lo que necesitás para tu hogar, en un solo lugar.</p>
+  <span class="hero-badge">🌿 Productos frescos y de calidad</span>
+</section>
+
+<!-- CATEGORIAS -->
+<div class="categorias">
+  <button class="cat-btn active" onclick="filtrar('todos', this)">Todos</button>
+  <button class="cat-btn" onclick="filtrar('limpieza', this)">🧴 Limpieza</button>
+  <button class="cat-btn" onclick="filtrar('secos', this)">🌾 Secos</button>
+  <button class="cat-btn" onclick="filtrar('lacteos', this)">🥛 Lácteos</button>
+  <button class="cat-btn" onclick="filtrar('bebidas', this)">🥤 Bebidas</button>
+  <button class="cat-btn" onclick="filtrar('higiene', this)">🪥 Higiene</button>
+</div>
+
+<!-- PRODUCTOS -->
+<h2 class="seccion-titulo">Nuestros Productos</h2>
+<div class="productos-grid" id="productos-grid"></div>
+
+<!-- CARRITO MODAL -->
+<div class="overlay" id="overlay" onclick="cerrarSiOverlay(event)">
+  <div class="carrito-panel">
+    <div class="carrito-header">
+      <h2>🛒 Tu Carrito</h2>
+      <button class="cerrar-btn" onclick="cerrarCarrito()">✕</button>
+    </div>
+    <div id="carrito-items"></div>
+    <div class="carrito-total" id="carrito-total"></div>
+    <button class="btn-pedido" id="btn-whatsapp" onclick="enviarWhatsApp()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.564 4.14 1.545 5.876L0 24l6.335-1.52A11.953 11.953 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.374l-.36-.214-3.727.894.938-3.638-.234-.373A9.818 9.818 0 1112 21.818z"/></svg>
+      Pedir por WhatsApp
+    </button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <strong>ZG Almacén</strong> — Tu almacén de confianza 🌿<br/>
+  <small>Hacé tu pedido y te contactamos a la brevedad.</small>
+</footer>
+
+<script>
+  const WHATSAPP_NUMBER = "541133869762";
+
+  let productos = [];
+  let carrito = {};
+  let categoriaActual = "todos";
+
+  // Carga productos desde productos.csv
+  async function cargarProductos() {
+    try {
+      const res = await fetch('productos.csv');
+      const text = await res.text();
+      const lineas = text.trim().split('\n').slice(1);
+      productos = lineas.filter(l => l.trim()).map(linea => {
+        const partes = linea.split(',');
+        return {
+          id: parseInt(partes[0]),
+          nombre: partes[1].trim(),
+          emoji: partes[2].trim(),
+          precio: parseInt(partes[3]),
+          cat: partes[4].trim(),
+          desc: partes[5].trim()
+        };
+      });
+      renderProductos();
+    } catch (e) {
+      document.getElementById('productos-grid').innerHTML =
+        '<p style="padding:2rem;color:#c00;">⚠️ No se pudo cargar productos.csv. Asegurate de que esté en la misma carpeta.</p>';
+    }
+  }
+
+  function renderProductos() {
+    const grid = document.getElementById("productos-grid");
+    const lista = categoriaActual === "todos" ? productos : productos.filter(p => p.cat === categoriaActual);
+    grid.innerHTML = lista.map((p, i) => `
+      <div class="producto-card" style="animation-delay:${i*0.05}s">
+        <div class="producto-img">${p.emoji}</div>
+        <div class="producto-info">
+          <div class="producto-nombre">${p.nombre}</div>
+          <div class="producto-desc">${p.desc}</div>
+          <div class="producto-precio">$${p.precio.toLocaleString('es-AR')}</div>
+          <button class="btn-agregar" onclick="agregarAlCarrito(${p.id})">+ Agregar</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function filtrar(cat, btn) {
+    categoriaActual = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProductos();
+  }
+
+  function agregarAlCarrito(id) {
+    carrito[id] = (carrito[id] || 0) + 1;
+    actualizarContador();
+    animarBoton(id);
+  }
+
+  function animarBoton(id) {
+    const count = document.getElementById('carrito-count');
+    count.style.transform = 'scale(1.4)';
+    setTimeout(() => count.style.transform = 'scale(1)', 200);
+  }
+
+  function actualizarContador() {
+    const total = Object.values(carrito).reduce((a, b) => a + b, 0);
+    document.getElementById('carrito-count').textContent = total;
+  }
+
+  function abrirCarrito() {
+    renderCarrito();
+    document.getElementById('overlay').classList.add('open');
+  }
+
+  function cerrarCarrito() {
+    document.getElementById('overlay').classList.remove('open');
+  }
+
+  function cerrarSiOverlay(e) {
+    if (e.target === document.getElementById('overlay')) cerrarCarrito();
+  }
+
+  function renderCarrito() {
+    const items = document.getElementById('carrito-items');
+    const totalEl = document.getElementById('carrito-total');
+    const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
+
+    if (ids.length === 0) {
+      items.innerHTML = '<div class="carrito-vacio">Tu carrito está vacío 🛒</div>';
+      totalEl.textContent = '';
+      return;
+    }
+
+    let total = 0;
+    items.innerHTML = ids.map(id => {
+      const p = productos.find(x => x.id == id);
+      const subtotal = p.precio * carrito[id];
+      total += subtotal;
+      return `
+        <div class="carrito-item">
+          <span class="carrito-item-emoji">${p.emoji}</span>
+          <div class="carrito-item-info">
+            <div class="carrito-item-nombre">${p.nombre}</div>
+            <div class="carrito-item-precio">$${p.precio.toLocaleString('es-AR')} c/u</div>
+          </div>
+          <div class="carrito-item-controles">
+            <button class="ctrl-btn" onclick="cambiarCant(${id}, -1)">−</button>
+            <span class="cant">${carrito[id]}</span>
+            <button class="ctrl-btn" onclick="cambiarCant(${id}, 1)">+</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    totalEl.textContent = `Total: $${total.toLocaleString('es-AR')}`;
+  }
+
+  function cambiarCant(id, delta) {
+    carrito[id] = (carrito[id] || 0) + delta;
+    if (carrito[id] <= 0) delete carrito[id];
+    actualizarContador();
+    renderCarrito();
+  }
+
+  function enviarWhatsApp() {
+    const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
+    if (ids.length === 0) return alert("Tu carrito está vacío.");
+    let msg = "Hola ZG! Quiero hacer el siguiente pedido:\n\n";
+    let total = 0;
+    ids.forEach(id => {
+      const p = productos.find(x => x.id == id);
+      const sub = p.precio * carrito[id];
+      total += sub;
+      msg += `• ${p.nombre} x${carrito[id]} = $${sub.toLocaleString('es-AR')}\n`;
+    });
+    msg += `\n*Total: $${total.toLocaleString('es-AR')}*`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+  }
+
+  cargarProductos();
+</script>
+</body>
+</html>
