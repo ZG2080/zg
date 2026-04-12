@@ -317,7 +317,7 @@
     <p>
       <strong>PC:</strong> WASD o flechas para mover · ESPACIO para disparar<br/>
       <strong>Celular:</strong> Joystick + botón de disparo<br/><br/>
-      ⏱️ 20 minutos · ☠️ Gas venenoso · 👾 Jefe al minuto 15<br/>
+      ⏱️ 20 minutos · 👾 Oleadas de enemigos · ☠️ Jefe al minuto 15<br/>
       🏆 El que más puntos haga gana el premio del día
     </p>
   </div>
@@ -354,6 +354,7 @@
 
 <!-- HUD -->
 <div id="hud" style="display:none">
+  <a href="index.html" style="color:var(--verde-claro);font-family:'Orbitron',monospace;font-size:0.7rem;text-decoration:none;border:1px solid rgba(82,183,136,0.4);border-radius:6px;padding:0.25rem 0.6rem;white-space:nowrap;">🛒 Tienda</a>
   <div class="hud-item"><span class="hud-label">DNI</span><span class="hud-val" id="hud-dni"></span></div>
   <div class="hud-item"><span class="hud-label">PTS</span><span class="hud-val" id="hud-score">0</span></div>
   <div class="hud-item"><span class="hud-label">OLEADA</span><span class="hud-val" id="hud-oleada">1</span></div>
@@ -481,6 +482,7 @@ function resetJuego() {
   jefeMuerto = false;
   jefaAparecido = false;
   gasActivo = false;
+  esperandoOleada = false;
   balas = [];
   enemigos = [];
   particulas = [];
@@ -592,13 +594,16 @@ function disparar() {
   if (jugador.cooldown > 0) return;
   jugador.cooldown = 12;
 
+  // Usar ángulo actual del jugador (apunta hacia mouse o dirección de movimiento)
+  const ang = jugador.ang;
   balas.push({
-    x: jugador.x,
-    y: jugador.y,
-    vx: Math.cos(jugador.ang) * 9,
-    vy: Math.sin(jugador.ang) * 9,
+    x: jugador.x + Math.cos(ang) * (jugador.r + 6),
+    y: jugador.y + Math.sin(ang) * (jugador.r + 6),
+    vx: Math.cos(ang) * 10,
+    vy: Math.sin(ang) * 10,
+    ang: ang,
     r: 5,
-    vida: 60
+    vida: 80
   });
 }
 
@@ -951,11 +956,16 @@ function recibirDaño() {
 }
 
 // ===== OLEADAS =====
+let esperandoOleada = false;
 function verificarOleada() {
-  if (enemigos.length === 0 && !jefe) {
+  if (enemigos.length === 0 && !jefe && !esperandoOleada) {
+    esperandoOleada = true;
     oleada++;
     actualizarHUD();
-    setTimeout(spawnOleada, 2000);
+    setTimeout(() => {
+      esperandoOleada = false;
+      spawnOleada();
+    }, 2000);
   }
 }
 
