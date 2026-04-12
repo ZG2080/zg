@@ -324,6 +324,12 @@
   <input class="input-dni" id="input-dni" type="number" placeholder="Ingresá tu DNI" maxlength="8"/>
   <button class="btn" onclick="iniciarJuego()">▶ JUGAR</button>
   <button class="btn" style="margin-top:0.8rem;background:rgba(255,255,255,0.05);box-shadow:none;border:1px solid rgba(255,255,255,0.2)" onclick="mostrarRanking()">🏆 RANKING DEL DÍA</button>
+  <div style="margin-top:1.2rem;width:90%;max-width:340px;background:rgba(45,106,79,0.15);border:1px solid rgba(0,255,136,0.15);border-radius:12px;padding:0.9rem;text-align:center;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--verde-claro);margin-bottom:0.6rem;letter-spacing:2px;">📱 ENVIAR PUNTAJE DEL DÍA</div>
+    <input id="input-dni-envio" type="number" placeholder="Tu DNI" style="background:rgba(255,255,255,0.05);border:1px solid rgba(82,183,136,0.4);border-radius:8px;padding:0.45rem 0.8rem;font-family:'Orbitron',monospace;font-size:0.85rem;color:white;width:100%;text-align:center;outline:none;margin-bottom:0.6rem;"/>
+    <button onclick="enviarDesdePantallaInicio()" style="width:100%;background:linear-gradient(135deg,#128c7e,#25d366);color:white;border:none;border-radius:8px;padding:0.55rem;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:1px;">📲 ENVIAR MI MEJOR PUNTAJE</button>
+    <div id="msg-envio-inicio" style="margin-top:0.5rem;font-size:0.75rem;color:rgba(255,255,255,0.5);min-height:1rem;"></div>
+  </div>
   <a href="index.html" style="margin-top:0.8rem;color:rgba(255,255,255,0.5);font-size:0.85rem;text-decoration:none;font-family:'Exo 2',sans-serif;">🛒 Volver a la tienda</a>
 
 
@@ -469,7 +475,7 @@ function iniciarJuego() {
 
   document.getElementById('pantalla-inicio').classList.add('oculta');
   document.getElementById('hud').style.display = 'flex';
-  if (isMobile) document.getElementById('panel-envio').style.display = 'none';
+
   document.getElementById('hud-dni').textContent = dni;
 
   resetJuego();
@@ -497,7 +503,7 @@ function resetJuego() {
     x: canvas.width / 2,
     y: canvas.height / 2,
     r: 14,
-    vel: isMobile ? 1.8 : 3.5,
+    vel: 3.5,
     ang: 0,
     cooldown: 0
   };
@@ -984,7 +990,7 @@ function terminarJuego(motivo) {
 
   document.getElementById('hud').style.display = 'none';
   document.getElementById('gas-warning').className = '';
-  if (isMobile) document.getElementById('panel-envio').style.display = 'flex';
+
 
   const pantalla = document.getElementById('pantalla-gameover');
   pantalla.classList.remove('oculta');
@@ -1150,7 +1156,7 @@ function mostrarRanking() {
 function reiniciar() {
   document.getElementById('pantalla-gameover').classList.add('oculta');
   document.getElementById('hud').style.display = 'flex';
-  if (isMobile) document.getElementById('panel-envio').style.display = 'none';
+
   resetJuego();
   estado = 'jugando';
   gameLoop = requestAnimationFrame(update);
@@ -1162,16 +1168,9 @@ function volverInicio() {
   document.getElementById('pantalla-ranking').classList.add('oculta');
   document.getElementById('hud').style.display = 'none';
   document.getElementById('pantalla-inicio').classList.remove('oculta');
-  if (isMobile) document.getElementById('panel-envio').style.display = 'flex';
+
   estado = 'inicio';
 }
 </script>
-<!-- PANEL ENVIO FIJO ABAJO -->
-<div id="panel-envio" style="position:fixed;bottom:0;left:0;right:0;background:rgba(10,15,10,0.97);border-top:1px solid rgba(0,255,136,0.2);padding:0.7rem 1rem;z-index:200;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;justify-content:center;" id="panel-envio-bar">
-  <span style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--verde-claro);white-space:nowrap;">📱 ENVIAR PUNTAJE:</span>
-  <input id="input-dni-envio" type="number" placeholder="Tu DNI" style="background:rgba(255,255,255,0.07);border:1px solid rgba(82,183,136,0.4);border-radius:6px;padding:0.4rem 0.7rem;font-family:'Orbitron',monospace;font-size:0.8rem;color:white;width:140px;text-align:center;outline:none;"/>
-  <button onclick="enviarDesdePantallaInicio()" style="background:linear-gradient(135deg,#128c7e,#25d366);color:white;border:none;border-radius:6px;padding:0.4rem 0.9rem;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;cursor:pointer;white-space:nowrap;">📲 ENVIAR</button>
-  <div id="msg-envio-inicio" style="font-size:0.72rem;color:rgba(255,255,255,0.5);width:100%;text-align:center;min-height:0.9rem;"></div>
-</div>
 </body>
 </html>
