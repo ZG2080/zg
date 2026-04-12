@@ -324,6 +324,7 @@
   <input class="input-dni" id="input-dni" type="number" placeholder="Ingresá tu DNI" maxlength="8"/>
   <button class="btn" onclick="iniciarJuego()">▶ JUGAR</button>
   <button class="btn" style="margin-top:0.8rem;background:rgba(255,255,255,0.05);box-shadow:none;border:1px solid rgba(255,255,255,0.2)" onclick="mostrarRanking()">🏆 RANKING DEL DÍA</button>
+  <a href="index.html" style="margin-top:0.8rem;color:rgba(255,255,255,0.5);font-size:0.85rem;text-decoration:none;font-family:'Exo 2',sans-serif;">🛒 Volver a la tienda</a>
 </div>
 
 <!-- PANTALLA GAME OVER -->
@@ -339,6 +340,7 @@
   <div class="btn-group">
     <button class="btn" onclick="reiniciar()">↺ JUGAR DE NUEVO</button>
     <button class="btn" style="background:rgba(255,255,255,0.05);box-shadow:none;border:1px solid rgba(255,255,255,0.2)" onclick="volverInicio()">⬅ INICIO</button>
+    <a href="index.html" class="btn" style="background:rgba(255,255,255,0.05);box-shadow:none;border:1px solid rgba(255,255,255,0.2);text-decoration:none;display:flex;align-items:center;justify-content:center;">🛒 Ir a la tienda</a>
   </div>
 </div>
 
@@ -503,12 +505,7 @@ function tickTimer() {
   if (estado !== 'jugando') return;
   tiempoRestante--;
 
-  // Gas empieza a los 5 minutos
-  if (tiempoRestante <= 15 * 60) {
-    gasActivo = true;
-    gasRadio -= 1.5;
-    if (gasRadio < 80) gasRadio = 80;
-  }
+  // Gas desactivado
 
   // Jefe al minuto 15 (5 minutos restantes)
   if (tiempoRestante === 5 * 60 && !jefaAparecido) {
@@ -551,7 +548,7 @@ function actualizarHUD() {
 
 // ===== SPAWN =====
 function spawnOleada() {
-  const cant = 3 + oleada * 2;
+  const cant = 2 + Math.floor(oleada * 1.2);
   for (let i = 0; i < cant; i++) {
     setTimeout(() => spawnEnemigo(), i * 300);
   }
@@ -676,16 +673,7 @@ function moverJugador() {
   jugador.x = Math.max(jugador.r, Math.min(canvas.width - jugador.r, jugador.x));
   jugador.y = Math.max(jugador.r, Math.min(canvas.height - jugador.r, jugador.y));
 
-  // Verificar gas
-  if (gasActivo) {
-    const cx = canvas.width / 2, cy = canvas.height / 2;
-    const dist = Math.sqrt((jugador.x-cx)**2 + (jugador.y-cy)**2);
-    if (dist > gasRadio) {
-      recibirDaño();
-      jugador.x = cx + (jugador.x-cx) * (gasRadio/dist) * 0.98;
-      jugador.y = cy + (jugador.y-cy) * (gasRadio/dist) * 0.98;
-    }
-  }
+  // Gas desactivado
 }
 
 function dibujarJugador() {
