@@ -469,6 +469,7 @@ function iniciarJuego() {
 
   document.getElementById('pantalla-inicio').classList.add('oculta');
   document.getElementById('hud').style.display = 'flex';
+  if (isMobile) document.getElementById('panel-envio').style.display = 'none';
   document.getElementById('hud-dni').textContent = dni;
 
   resetJuego();
@@ -496,7 +497,7 @@ function resetJuego() {
     x: canvas.width / 2,
     y: canvas.height / 2,
     r: 14,
-    vel: 3.5,
+    vel: isMobile ? 1.8 : 3.5,
     ang: 0,
     cooldown: 0
   };
@@ -983,6 +984,7 @@ function terminarJuego(motivo) {
 
   document.getElementById('hud').style.display = 'none';
   document.getElementById('gas-warning').className = '';
+  if (isMobile) document.getElementById('panel-envio').style.display = 'flex';
 
   const pantalla = document.getElementById('pantalla-gameover');
   pantalla.classList.remove('oculta');
@@ -1148,6 +1150,7 @@ function mostrarRanking() {
 function reiniciar() {
   document.getElementById('pantalla-gameover').classList.add('oculta');
   document.getElementById('hud').style.display = 'flex';
+  if (isMobile) document.getElementById('panel-envio').style.display = 'none';
   resetJuego();
   estado = 'jugando';
   gameLoop = requestAnimationFrame(update);
@@ -1159,11 +1162,12 @@ function volverInicio() {
   document.getElementById('pantalla-ranking').classList.add('oculta');
   document.getElementById('hud').style.display = 'none';
   document.getElementById('pantalla-inicio').classList.remove('oculta');
+  if (isMobile) document.getElementById('panel-envio').style.display = 'flex';
   estado = 'inicio';
 }
 </script>
 <!-- PANEL ENVIO FIJO ABAJO -->
-<div id="panel-envio" style="position:fixed;bottom:0;left:0;right:0;background:rgba(10,15,10,0.97);border-top:1px solid rgba(0,255,136,0.2);padding:0.7rem 1rem;z-index:200;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;justify-content:center;">
+<div id="panel-envio" style="position:fixed;bottom:0;left:0;right:0;background:rgba(10,15,10,0.97);border-top:1px solid rgba(0,255,136,0.2);padding:0.7rem 1rem;z-index:200;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;justify-content:center;" id="panel-envio-bar">
   <span style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--verde-claro);white-space:nowrap;">📱 ENVIAR PUNTAJE:</span>
   <input id="input-dni-envio" type="number" placeholder="Tu DNI" style="background:rgba(255,255,255,0.07);border:1px solid rgba(82,183,136,0.4);border-radius:6px;padding:0.4rem 0.7rem;font-family:'Orbitron',monospace;font-size:0.8rem;color:white;width:140px;text-align:center;outline:none;"/>
   <button onclick="enviarDesdePantallaInicio()" style="background:linear-gradient(135deg,#128c7e,#25d366);color:white;border:none;border-radius:6px;padding:0.4rem 0.9rem;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;cursor:pointer;white-space:nowrap;">📲 ENVIAR</button>
