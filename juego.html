@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>ZG Shooter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Exo+2:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --verde: #2d6a4f;
+      --verde-claro: #52b788;
+      --verde-neo: #00ff88;
+      --rojo: #ff3333;
+      --amarillo: #ffd700;
+      --negro: #0a0a0a;
+      --gris: #1a1a1a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
+
+    body {
+      background: var(--negro);
+      color: white;
+      font-family: 'Exo 2', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ===== PANTALLAS ===== */
+    .pantalla {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, #0d2b1a 0%, #0a0a0a 100%);
+      z-index: 100;
+    }
+
+    .pantalla.oculta { display: none; }
+
+    .logo-titulo {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 900;
+      color: var(--verde-neo);
+      text-shadow: 0 0 30px var(--verde-neo), 0 0 60px var(--verde-claro);
+      letter-spacing: 6px;
+      margin-bottom: 0.3rem;
+      animation: pulso 2s ease-in-out infinite;
+    }
+
+    @keyframes pulso {
+      0%,100% { text-shadow: 0 0 30px var(--verde-neo), 0 0 60px var(--verde-claro); }
+      50% { text-shadow: 0 0 50px var(--verde-neo), 0 0 100px var(--verde-claro), 0 0 150px var(--verde); }
+    }
+
+    .subtitulo {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(0.8rem, 2vw, 1.1rem);
+      color: var(--verde-claro);
+      letter-spacing: 4px;
+      margin-bottom: 3rem;
+      opacity: 0.8;
+    }
+
+    .instrucciones {
+      background: rgba(45,106,79,0.15);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 1.2rem 2rem;
+      margin-bottom: 2rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .instrucciones p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.8;
+    }
+
+    .instrucciones strong { color: var(--verde-neo); }
+
+    .input-dni {
+      background: rgba(255,255,255,0.05);
+      border: 2px solid var(--verde-claro);
+      border-radius: 10px;
+      padding: 0.8rem 1.5rem;
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      color: white;
+      width: 280px;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .input-dni:focus {
+      border-color: var(--verde-neo);
+      box-shadow: 0 0 20px rgba(0,255,136,0.3);
+    }
+
+    .input-dni::placeholder { color: rgba(255,255,255,0.3); font-size: 0.85rem; }
+
+    .btn {
+      background: linear-gradient(135deg, var(--verde) 0%, var(--verde-claro) 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.9rem 2.5rem;
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(82,183,136,0.4);
+    }
+
+    .btn:hover { transform: scale(1.05); box-shadow: 0 6px 30px rgba(82,183,136,0.6); }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-rojo {
+      background: linear-gradient(135deg, #8b0000 0%, var(--rojo) 100%);
+      box-shadow: 0 4px 20px rgba(255,51,51,0.4);
+    }
+
+    /* ===== HUD ===== */
+    #hud {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1rem;
+      background: rgba(0,0,0,0.7);
+      border-bottom: 1px solid rgba(0,255,136,0.2);
+      z-index: 50;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+
+    .hud-item {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(0.65rem, 2vw, 0.85rem);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .hud-label { color: var(--verde-claro); }
+    .hud-val { color: white; font-weight: 700; }
+
+    .vidas { color: var(--rojo); font-size: 1rem; letter-spacing: 2px; }
+
+    .tiempo-val { color: var(--amarillo); }
+    .tiempo-val.urgente { color: var(--rojo); animation: parpadeo 0.5s infinite; }
+
+    @keyframes parpadeo { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ===== CANVAS ===== */
+    #canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* ===== GAS ===== */
+    #gas-warning {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 40;
+      border: 8px solid transparent;
+      transition: border-color 0.5s;
+    }
+
+    #gas-warning.activo {
+      border-color: rgba(0,200,0,0.5);
+      box-shadow: inset 0 0 60px rgba(0,200,0,0.3);
+      animation: gasParpadeo 1s infinite;
+    }
+
+    @keyframes gasParpadeo {
+      0%,100%{ box-shadow: inset 0 0 60px rgba(0,200,0,0.3); }
+      50%{ box-shadow: inset 0 0 120px rgba(0,200,0,0.6); }
+    }
+
+    /* ===== JEFE WARNING ===== */
+    #boss-warning {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.5rem, 5vw, 3rem);
+      font-weight: 900;
+      color: var(--rojo);
+      text-shadow: 0 0 30px var(--rojo);
+      z-index: 60;
+      display: none;
+      text-align: center;
+      animation: bossShake 0.1s infinite;
+    }
+
+    @keyframes bossShake {
+      0%,100%{transform:translate(-50%,-50%) rotate(-1deg)}
+      50%{transform:translate(-50%,-50%) rotate(1deg)}
+    }
+
+    /* ===== CONTROLES MÓVIL ===== */
+    #controles-movil {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      display: none;
+      padding: 1rem;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    #controles-movil.visible { display: flex; justify-content: space-between; align-items: flex-end; }
+
+    #joystick-area {
+      width: 120px;
+      height: 120px;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(0,255,136,0.3);
+      border-radius: 50%;
+      position: relative;
+      pointer-events: all;
+      touch-action: none;
+    }
+
+    #joystick-thumb {
+      width: 50px;
+      height: 50px;
+      background: radial-gradient(circle, var(--verde-claro), var(--verde));
+      border-radius: 50%;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 15px rgba(82,183,136,0.5);
+    }
+
+    #btn-disparar {
+      width: 90px;
+      height: 90px;
+      background: radial-gradient(circle, #ff6666, var(--rojo));
+      border: 3px solid rgba(255,100,100,0.5);
+      border-radius: 50%;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      pointer-events: all;
+      box-shadow: 0 0 20px rgba(255,51,51,0.5);
+      letter-spacing: 1px;
+    }
+
+    /* ===== RANKING ===== */
+    .ranking-lista {
+      width: 90%;
+      max-width: 400px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 1rem 0;
+    }
+
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.9rem;
+    }
+
+    .ranking-item:first-child { color: var(--amarillo); font-weight: 700; }
+    .ranking-item:nth-child(2) { color: #ccc; }
+    .ranking-item:nth-child(3) { color: #cd7f32; }
+
+    .ranking-pos { font-family: 'Orbitron', monospace; width: 30px; }
+    .ranking-dni { flex: 1; margin: 0 1rem; letter-spacing: 1px; }
+    .ranking-pts { font-family: 'Orbitron', monospace; color: var(--verde-neo); }
+
+    .score-final {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
+      font-weight: 900;
+      color: var(--verde-neo);
+      text-shadow: 0 0 20px var(--verde-neo);
+      margin: 1rem 0;
+    }
+
+    .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
+
+    scrollbar-width: thin;
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--verde); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- PANTALLA INICIO -->
+<div class="pantalla" id="pantalla-inicio">
+  <div class="logo-titulo">ZG</div>
+  <div class="subtitulo">SHOOTER</div>
+  <div class="instrucciones">
+    <p>
+      <strong>PC:</strong> WASD o flechas para mover · ESPACIO para disparar<br/>
+      <strong>Celular:</strong> Joystick + botón de disparo<br/><br/>
+      ⏱️ 20 minutos · ☠️ Gas venenoso · 👾 Jefe al minuto 15<br/>
+      🏆 El que más puntos haga gana el premio del día
+    </p>
+  </div>
+  <input class="input-dni" id="input-dni" type="number" placeholder="Ingresá tu DNI" maxlength="8"/>
+  <button class="btn" onclick="iniciarJuego()">▶ JUGAR</button>
+  <button class="btn" style="margin-top:0.8rem;background:rgba(255,255,255,0.05);box-shadow:none;border:1px solid rgba(255,255,255,0.2)" onclick="mostrarRanking()">🏆 RANKING DEL DÍA</button>
+</div>
+
+<!-- PANTALLA GAME OVER -->
+<div class="pantalla oculta" id="pantalla-gameover">
+  <div class="logo-titulo" style="font-size:clamp(1.5rem,5vw,2.5rem);margin-bottom:0.5rem">GAME OVER</div>
+  <div id="go-dni" style="color:var(--verde-claro);font-family:'Orbitron',monospace;font-size:0.9rem;margin-bottom:0.5rem;letter-spacing:2px"></div>
+  <div class="score-final" id="go-score"></div>
+  <div id="go-mensaje" style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:1rem;text-align:center"></div>
+
+  <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--verde-claro);margin-bottom:0.5rem">🏆 RANKING DEL DÍA</div>
+  <div class="ranking-lista" id="go-ranking"></div>
+
+  <div class="btn-group">
+    <button class="btn" onclick="reiniciar()">↺ JUGAR DE NUEVO</button>
+    <button class="btn" style="background:rgba(255,255,255,0.05);box-shadow:none;border:1px solid rgba(255,255,255,0.2)" onclick="volverInicio()">⬅ INICIO</button>
+  </div>
+</div>
+
+<!-- PANTALLA RANKING -->
+<div class="pantalla oculta" id="pantalla-ranking">
+  <div class="logo-titulo" style="font-size:2rem">🏆 RANKING</div>
+  <div class="subtitulo" style="margin-bottom:1rem">TOP DEL DÍA</div>
+  <div class="ranking-lista" id="ranking-lista"></div>
+  <button class="btn" style="margin-top:1rem" onclick="volverInicio()">⬅ VOLVER</button>
+</div>
+
+<!-- HUD -->
+<div id="hud" style="display:none">
+  <div class="hud-item"><span class="hud-label">DNI</span><span class="hud-val" id="hud-dni"></span></div>
+  <div class="hud-item"><span class="hud-label">PTS</span><span class="hud-val" id="hud-score">0</span></div>
+  <div class="hud-item"><span class="hud-label">OLEADA</span><span class="hud-val" id="hud-oleada">1</span></div>
+  <div class="hud-item vidas" id="hud-vidas">♥♥♥</div>
+  <div class="hud-item"><span class="hud-label">TIEMPO</span><span class="hud-val tiempo-val" id="hud-tiempo">20:00</span></div>
+</div>
+
+<!-- GAS WARNING -->
+<div id="gas-warning"></div>
+
+<!-- BOSS WARNING -->
+<div id="boss-warning">☠️ JEFE FINAL ☠️</div>
+
+<!-- CANVAS -->
+<canvas id="canvas"></canvas>
+
+<!-- CONTROLES MÓVIL -->
+<div id="controles-movil">
+  <div id="joystick-area"><div id="joystick-thumb"></div></div>
+  <button id="btn-disparar" ontouchstart="disparar()">🔫<br/>FUEGO</button>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+// ===== ESTADO DEL JUEGO =====
+let estado = 'inicio';
+let dni = '';
+let puntos = 0;
+let vidas = 3;
+let oleada = 1;
+let tiempoRestante = 20 * 60; // segundos
+let jefeMuerto = false;
+let jefaAparecido = false;
+let gasRadio = 0; // radio del area segura
+let gasActivo = false;
+let gameLoop = null;
+let timerInterval = null;
+let isMobile = false;
+
+// Entidades
+let jugador = {};
+let balas = [];
+let enemigos = [];
+let particulas = [];
+let jefe = null;
+
+// Input
+const keys = {};
+let joystickDir = { x: 0, y: 0 };
+let joystickActivo = false;
+let joystickOrigen = { x: 0, y: 0 };
+
+// ===== RESIZE =====
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  gasRadio = Math.min(canvas.width, canvas.height) * 0.5;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ===== DETECCIÓN MÓVIL =====
+isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent) || window.innerWidth < 768;
+if (isMobile) document.getElementById('controles-movil').classList.add('visible');
+
+// ===== TECLADO =====
+document.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (e.code === 'Space') { e.preventDefault(); disparar(); }
+});
+document.addEventListener('keyup', e => keys[e.code] = false);
+
+// ===== JOYSTICK =====
+const joystickArea = document.getElementById('joystick-area');
+const joystickThumb = document.getElementById('joystick-thumb');
+
+joystickArea.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  const rect = joystickArea.getBoundingClientRect();
+  joystickOrigen = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
+  joystickActivo = true;
+}, { passive: false });
+
+joystickArea.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!joystickActivo) return;
+  const t = e.touches[0];
+  const dx = t.clientX - joystickOrigen.x;
+  const dy = t.clientY - joystickOrigen.y;
+  const dist = Math.min(Math.sqrt(dx*dx+dy*dy), 40);
+  const ang = Math.atan2(dy, dx);
+  joystickDir = { x: Math.cos(ang) * (dist/40), y: Math.sin(ang) * (dist/40) };
+  joystickThumb.style.transform = `translate(calc(-50% + ${Math.cos(ang)*dist}px), calc(-50% + ${Math.sin(ang)*dist}px))`;
+}, { passive: false });
+
+joystickArea.addEventListener('touchend', () => {
+  joystickActivo = false;
+  joystickDir = { x: 0, y: 0 };
+  joystickThumb.style.transform = 'translate(-50%, -50%)';
+});
+
+// ===== INICIAR JUEGO =====
+function iniciarJuego() {
+  dni = document.getElementById('input-dni').value.trim();
+  if (!dni || dni.length < 7) { alert('Por favor ingresá tu DNI válido'); return; }
+
+  document.getElementById('pantalla-inicio').classList.add('oculta');
+  document.getElementById('hud').style.display = 'flex';
+  document.getElementById('hud-dni').textContent = dni;
+
+  resetJuego();
+  estado = 'jugando';
+  gameLoop = requestAnimationFrame(update);
+  timerInterval = setInterval(tickTimer, 1000);
+}
+
+function resetJuego() {
+  puntos = 0;
+  vidas = 3;
+  oleada = 1;
+  tiempoRestante = 20 * 60;
+  jefeMuerto = false;
+  jefaAparecido = false;
+  gasActivo = false;
+  balas = [];
+  enemigos = [];
+  particulas = [];
+  jefe = null;
+  gasRadio = Math.min(canvas.width, canvas.height) * 0.52;
+
+  jugador = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    r: 14,
+    vel: 3.5,
+    ang: 0,
+    cooldown: 0
+  };
+
+  actualizarHUD();
+  spawnOleada();
+}
+
+// ===== TIMER =====
+function tickTimer() {
+  if (estado !== 'jugando') return;
+  tiempoRestante--;
+
+  // Gas empieza a los 5 minutos
+  if (tiempoRestante <= 15 * 60) {
+    gasActivo = true;
+    gasRadio -= 1.5;
+    if (gasRadio < 80) gasRadio = 80;
+  }
+
+  // Jefe al minuto 15 (5 minutos restantes)
+  if (tiempoRestante === 5 * 60 && !jefaAparecido) {
+    mostrarBossWarning();
+  }
+
+  if (tiempoRestante <= 0) terminarJuego('tiempo');
+
+  actualizarHUD();
+}
+
+function mostrarBossWarning() {
+  jefaAparecido = true;
+  const bw = document.getElementById('boss-warning');
+  bw.style.display = 'block';
+  setTimeout(() => {
+    bw.style.display = 'none';
+    spawnJefe();
+  }, 3000);
+}
+
+// ===== HUD =====
+function actualizarHUD() {
+  document.getElementById('hud-score').textContent = puntos;
+  document.getElementById('hud-oleada').textContent = oleada;
+  const mins = Math.floor(tiempoRestante / 60);
+  const segs = tiempoRestante % 60;
+  const tiempoEl = document.getElementById('hud-tiempo');
+  tiempoEl.textContent = `${mins}:${segs.toString().padStart(2,'0')}`;
+  tiempoEl.className = 'hud-val tiempo-val' + (tiempoRestante < 60 ? ' urgente' : '');
+
+  let vidasStr = '';
+  for (let i = 0; i < 3; i++) vidasStr += i < vidas ? '♥' : '♡';
+  document.getElementById('hud-vidas').textContent = vidasStr;
+
+  // Gas warning visual
+  const gw = document.getElementById('gas-warning');
+  gw.className = gasActivo ? 'activo' : '';
+}
+
+// ===== SPAWN =====
+function spawnOleada() {
+  const cant = 3 + oleada * 2;
+  for (let i = 0; i < cant; i++) {
+    setTimeout(() => spawnEnemigo(), i * 300);
+  }
+}
+
+function spawnEnemigo() {
+  const lado = Math.floor(Math.random() * 4);
+  let x, y;
+  if (lado === 0) { x = Math.random() * canvas.width; y = -20; }
+  else if (lado === 1) { x = canvas.width + 20; y = Math.random() * canvas.height; }
+  else if (lado === 2) { x = Math.random() * canvas.width; y = canvas.height + 20; }
+  else { x = -20; y = Math.random() * canvas.height; }
+
+  enemigos.push({
+    x, y,
+    r: 12,
+    vel: 0.8 + oleada * 0.15 + Math.random() * 0.5,
+    hp: 1 + Math.floor(oleada / 3),
+    maxHp: 1 + Math.floor(oleada / 3),
+    tipo: 'normal'
+  });
+}
+
+function spawnJefe() {
+  jefe = {
+    x: Math.random() > 0.5 ? 80 : canvas.width - 80,
+    y: Math.random() > 0.5 ? 80 : canvas.height - 80,
+    r: 40,
+    vel: 1.2,
+    hp: 80,
+    maxHp: 80,
+    tipo: 'jefe',
+    ataque: 0,
+    fase: 1
+  };
+}
+
+// ===== DISPARO =====
+function disparar() {
+  if (estado !== 'jugando') return;
+  if (jugador.cooldown > 0) return;
+  jugador.cooldown = 12;
+
+  balas.push({
+    x: jugador.x,
+    y: jugador.y,
+    vx: Math.cos(jugador.ang) * 9,
+    vy: Math.sin(jugador.ang) * 9,
+    r: 5,
+    vida: 60
+  });
+}
+
+// ===== GAME LOOP =====
+function update() {
+  if (estado !== 'jugando') return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  dibujarFondo();
+  moverJugador();
+  moverBalas();
+  moverEnemigos();
+  moverJefe();
+  verificarColisiones();
+  dibujarGas();
+  dibujarParticulas();
+  dibujarBalas();
+  dibujarEnemigos();
+  dibujarJefe();
+  dibujarJugador();
+  verificarOleada();
+
+  if (jugador.cooldown > 0) jugador.cooldown--;
+
+  gameLoop = requestAnimationFrame(update);
+}
+
+// ===== FONDO =====
+function dibujarFondo() {
+  ctx.fillStyle = '#0a0f0a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(45,106,79,0.15)';
+  ctx.lineWidth = 0.5;
+  const gridSize = 40;
+  for (let x = 0; x < canvas.width; x += gridSize) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+  }
+  for (let y = 0; y < canvas.height; y += gridSize) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+  }
+}
+
+// ===== JUGADOR =====
+function moverJugador() {
+  let dx = 0, dy = 0;
+
+  if (keys['ArrowLeft'] || keys['KeyA']) dx -= 1;
+  if (keys['ArrowRight'] || keys['KeyD']) dx += 1;
+  if (keys['ArrowUp'] || keys['KeyW']) dy -= 1;
+  if (keys['ArrowDown'] || keys['KeyS']) dy += 1;
+
+  if (joystickActivo) { dx = joystickDir.x; dy = joystickDir.y; }
+
+  const mag = Math.sqrt(dx*dx + dy*dy);
+  if (mag > 0) {
+    dx /= mag; dy /= mag;
+    jugador.x += dx * jugador.vel;
+    jugador.y += dy * jugador.vel;
+    jugador.ang = Math.atan2(dy, dx);
+  }
+
+  // Puntero del mouse actualiza ángulo en PC
+  canvas.onmousemove = (e) => {
+    jugador.ang = Math.atan2(e.clientY - jugador.y, e.clientX - jugador.x);
+  };
+  canvas.onclick = () => disparar();
+
+  // Límites del canvas
+  jugador.x = Math.max(jugador.r, Math.min(canvas.width - jugador.r, jugador.x));
+  jugador.y = Math.max(jugador.r, Math.min(canvas.height - jugador.r, jugador.y));
+
+  // Verificar gas
+  if (gasActivo) {
+    const cx = canvas.width / 2, cy = canvas.height / 2;
+    const dist = Math.sqrt((jugador.x-cx)**2 + (jugador.y-cy)**2);
+    if (dist > gasRadio) {
+      recibirDaño();
+      jugador.x = cx + (jugador.x-cx) * (gasRadio/dist) * 0.98;
+      jugador.y = cy + (jugador.y-cy) * (gasRadio/dist) * 0.98;
+    }
+  }
+}
+
+function dibujarJugador() {
+  ctx.save();
+  ctx.translate(jugador.x, jugador.y);
+
+  // Sombra
+  ctx.shadowColor = '#00ff88';
+  ctx.shadowBlur = 15;
+
+  // Cuerpo
+  ctx.fillStyle = '#52b788';
+  ctx.beginPath();
+  ctx.arc(0, 0, jugador.r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Cañón
+  ctx.fillStyle = '#2d6a4f';
+  ctx.save();
+  ctx.rotate(jugador.ang);
+  ctx.fillRect(0, -4, jugador.r + 8, 8);
+  ctx.restore();
+
+  // Centro
+  ctx.fillStyle = '#00ff88';
+  ctx.beginPath();
+  ctx.arc(0, 0, 5, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+// ===== BALAS =====
+function moverBalas() {
+  balas = balas.filter(b => b.vida > 0);
+  balas.forEach(b => {
+    b.x += b.vx;
+    b.y += b.vy;
+    b.vida--;
+    if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) b.vida = 0;
+  });
+}
+
+function dibujarBalas() {
+  balas.forEach(b => {
+    ctx.save();
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+// ===== ENEMIGOS =====
+function moverEnemigos() {
+  enemigos.forEach(e => {
+    const ang = Math.atan2(jugador.y - e.y, jugador.x - e.x);
+    e.x += Math.cos(ang) * e.vel;
+    e.y += Math.sin(ang) * e.vel;
+  });
+}
+
+function dibujarEnemigos() {
+  enemigos.forEach(e => {
+    ctx.save();
+    ctx.shadowColor = '#ff3333';
+    ctx.shadowBlur = 10;
+
+    // Barra de vida
+    if (e.maxHp > 1) {
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(e.x - e.r, e.y - e.r - 8, e.r*2, 4);
+      ctx.fillStyle = '#ff3333';
+      ctx.fillRect(e.x - e.r, e.y - e.r - 8, e.r*2*(e.hp/e.maxHp), 4);
+    }
+
+    ctx.fillStyle = '#cc2222';
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#ff6666';
+    ctx.beginPath();
+    ctx.arc(e.x - 3, e.y - 3, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  });
+}
+
+// ===== JEFE =====
+function moverJefe() {
+  if (!jefe) return;
+
+  const ang = Math.atan2(jugador.y - jefe.y, jugador.x - jefe.x);
+  const vel = jefe.fase === 2 ? jefe.vel * 1.8 : jefe.vel;
+  jefe.x += Math.cos(ang) * vel;
+  jefe.y += Math.sin(ang) * vel;
+
+  if (jefe.hp < jefe.maxHp * 0.4) jefe.fase = 2;
+}
+
+function dibujarJefe() {
+  if (!jefe) return;
+  ctx.save();
+
+  ctx.shadowColor = jefe.fase === 2 ? '#ff0000' : '#ff6600';
+  ctx.shadowBlur = 30;
+
+  // Cuerpo
+  ctx.fillStyle = jefe.fase === 2 ? '#8b0000' : '#cc4400';
+  ctx.beginPath();
+  ctx.arc(jefe.x, jefe.y, jefe.r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Barra de vida
+  const barW = 100;
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.fillRect(jefe.x - barW/2, jefe.y - jefe.r - 14, barW, 8);
+  ctx.fillStyle = jefe.fase === 2 ? '#ff0000' : '#ff6600';
+  ctx.fillRect(jefe.x - barW/2, jefe.y - jefe.r - 14, barW*(jefe.hp/jefe.maxHp), 8);
+
+  // Cara
+  ctx.fillStyle = '#ff9944';
+  ctx.font = `${jefe.r}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('☠', jefe.x, jefe.y);
+
+  ctx.restore();
+}
+
+// ===== GAS =====
+function dibujarGas() {
+  if (!gasActivo) return;
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+
+  // Zona de gas (fuera del círculo seguro)
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 180, 0, 0.12)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Zona segura (limpiar)
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  ctx.arc(cx, cy, gasRadio, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
+
+  // Borde del gas
+  ctx.strokeStyle = 'rgba(0, 255, 0, 0.6)';
+  ctx.lineWidth = 4;
+  ctx.setLineDash([10, 5]);
+  ctx.beginPath();
+  ctx.arc(cx, cy, gasRadio, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.restore();
+}
+
+// ===== PARTÍCULAS =====
+function crearExplosion(x, y, color) {
+  for (let i = 0; i < 8; i++) {
+    const ang = (Math.PI * 2 / 8) * i;
+    particulas.push({
+      x, y,
+      vx: Math.cos(ang) * (2 + Math.random() * 3),
+      vy: Math.sin(ang) * (2 + Math.random() * 3),
+      r: 3 + Math.random() * 3,
+      vida: 20 + Math.random() * 20,
+      maxVida: 40,
+      color
+    });
+  }
+}
+
+function moverParticulas() {
+  particulas = particulas.filter(p => p.vida > 0);
+  particulas.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vx *= 0.9;
+    p.vy *= 0.9;
+    p.vida--;
+  });
+}
+
+function dibujarParticulas() {
+  moverParticulas();
+  particulas.forEach(p => {
+    ctx.save();
+    ctx.globalAlpha = p.vida / p.maxVida;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+// ===== COLISIONES =====
+let dañoCooldown = 0;
+
+function verificarColisiones() {
+  if (dañoCooldown > 0) dañoCooldown--;
+
+  // Balas vs enemigos
+  balas.forEach(b => {
+    enemigos = enemigos.filter(e => {
+      const dist = Math.sqrt((b.x-e.x)**2 + (b.y-e.y)**2);
+      if (dist < b.r + e.r) {
+        b.vida = 0;
+        e.hp--;
+        if (e.hp <= 0) {
+          crearExplosion(e.x, e.y, '#ff4444');
+          puntos += 10 * oleada;
+          actualizarHUD();
+          return false;
+        }
+        return true;
+      }
+      return true;
+    });
+
+    // Bala vs jefe
+    if (jefe) {
+      const dist = Math.sqrt((b.x-jefe.x)**2 + (b.y-jefe.y)**2);
+      if (dist < b.r + jefe.r) {
+        b.vida = 0;
+        jefe.hp -= 1;
+        crearExplosion(b.x, b.y, '#ff6600');
+        if (jefe.hp <= 0) {
+          crearExplosion(jefe.x, jefe.y, '#ffd700');
+          crearExplosion(jefe.x+20, jefe.y-20, '#ff6600');
+          crearExplosion(jefe.x-20, jefe.y+20, '#ff0000');
+          puntos += 500;
+          jefeMuerto = true;
+          jefe = null;
+          actualizarHUD();
+        }
+      }
+    }
+  });
+
+  // Enemigos vs jugador
+  if (dañoCooldown === 0) {
+    enemigos.forEach(e => {
+      const dist = Math.sqrt((jugador.x-e.x)**2 + (jugador.y-e.y)**2);
+      if (dist < jugador.r + e.r) {
+        recibirDaño();
+      }
+    });
+
+    // Jefe vs jugador
+    if (jefe) {
+      const dist = Math.sqrt((jugador.x-jefe.x)**2 + (jugador.y-jefe.y)**2);
+      if (dist < jugador.r + jefe.r) {
+        recibirDaño();
+      }
+    }
+  }
+}
+
+function recibirDaño() {
+  if (dañoCooldown > 0) return;
+  dañoCooldown = 90;
+  vidas--;
+  crearExplosion(jugador.x, jugador.y, '#52b788');
+  actualizarHUD();
+  if (vidas <= 0) terminarJuego('muerte');
+}
+
+// ===== OLEADAS =====
+function verificarOleada() {
+  if (enemigos.length === 0 && !jefe) {
+    oleada++;
+    actualizarHUD();
+    setTimeout(spawnOleada, 2000);
+  }
+}
+
+// ===== FIN DEL JUEGO =====
+function terminarJuego(motivo) {
+  estado = 'gameover';
+  cancelAnimationFrame(gameLoop);
+  clearInterval(timerInterval);
+
+  // Guardar en ranking
+  guardarPuntaje(dni, puntos);
+
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('gas-warning').className = '';
+
+  const pantalla = document.getElementById('pantalla-gameover');
+  pantalla.classList.remove('oculta');
+
+  document.getElementById('go-dni').textContent = `DNI: ${dni}`;
+  document.getElementById('go-score').textContent = `${puntos} PTS`;
+
+  let msg = '';
+  if (motivo === 'tiempo') msg = '⏱️ ¡Se acabó el tiempo!';
+  else if (motivo === 'muerte') msg = '💀 ¡Te quedaste sin vidas!';
+  document.getElementById('go-mensaje').textContent = msg;
+
+  mostrarRankingEnPantalla('go-ranking');
+}
+
+// ===== RANKING (localStorage) =====
+function obtenerFechaHoy() {
+  const hoy = new Date();
+  return `${hoy.getFullYear()}-${hoy.getMonth()+1}-${hoy.getDate()}`;
+}
+
+function guardarPuntaje(dni, pts) {
+  const fecha = obtenerFechaHoy();
+  const key = `zg_ranking_${fecha}`;
+  let ranking = [];
+  try { ranking = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
+
+  const idx = ranking.findIndex(r => r.dni === dni);
+  if (idx >= 0) {
+    if (pts > ranking[idx].pts) ranking[idx].pts = pts;
+  } else {
+    ranking.push({ dni, pts });
+  }
+
+  ranking.sort((a,b) => b.pts - a.pts);
+  ranking = ranking.slice(0, 20);
+  localStorage.setItem(key, JSON.stringify(ranking));
+}
+
+function obtenerRanking() {
+  const fecha = obtenerFechaHoy();
+  const key = `zg_ranking_${fecha}`;
+  try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; }
+}
+
+function mostrarRankingEnPantalla(containerId) {
+  const ranking = obtenerRanking();
+  const container = document.getElementById(containerId);
+  if (ranking.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:1rem">Sin puntajes hoy todavía</div>';
+    return;
+  }
+  const medallas = ['🥇','🥈','🥉'];
+  container.innerHTML = ranking.map((r,i) => `
+    <div class="ranking-item">
+      <span class="ranking-pos">${medallas[i] || (i+1)}</span>
+      <span class="ranking-dni">DNI: ${r.dni}</span>
+      <span class="ranking-pts">${r.pts} pts</span>
+    </div>
+  `).join('');
+}
+
+function mostrarRanking() {
+  document.getElementById('pantalla-inicio').classList.add('oculta');
+  document.getElementById('pantalla-ranking').classList.remove('oculta');
+  mostrarRankingEnPantalla('ranking-lista');
+}
+
+// ===== NAVEGACIÓN =====
+function reiniciar() {
+  document.getElementById('pantalla-gameover').classList.add('oculta');
+  document.getElementById('hud').style.display = 'flex';
+  resetJuego();
+  estado = 'jugando';
+  gameLoop = requestAnimationFrame(update);
+  timerInterval = setInterval(tickTimer, 1000);
+}
+
+function volverInicio() {
+  document.getElementById('pantalla-gameover').classList.add('oculta');
+  document.getElementById('pantalla-ranking').classList.add('oculta');
+  document.getElementById('hud').style.display = 'none';
+  document.getElementById('pantalla-inicio').classList.remove('oculta');
+  estado = 'inicio';
+}
+</script>
+</body>
+</html>
