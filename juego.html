@@ -337,6 +337,7 @@
   <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--verde-claro);margin-bottom:0.5rem">🏆 RANKING DEL DÍA</div>
   <div class="ranking-lista" id="go-ranking"></div>
 
+  <div id="btn-whatsapp-container" style="margin-top:0.8rem;width:90%;max-width:400px;text-align:center"></div>
   <div class="btn-group">
     <button class="btn" onclick="reiniciar()">↺ JUGAR DE NUEVO</button>
     <button class="btn" style="background:rgba(255,255,255,0.05);box-shadow:none;border:1px solid rgba(255,255,255,0.2)" onclick="volverInicio()">⬅ INICIO</button>
@@ -993,9 +994,32 @@ function terminarJuego(motivo) {
   document.getElementById('go-mensaje').textContent = msg;
 
   mostrarRankingEnPantalla('go-ranking');
+  renderizarBotonWhatsApp();
 }
 
 // ===== RANKING (localStorage) =====
+function yaEnvioHoy(dni) {
+  const fecha = obtenerFechaHoy();
+  const key = `zg_enviado_${fecha}_${dni}`;
+  return localStorage.getItem(key) === '1';
+}
+
+function marcarEnvioHoy(dni) {
+  const fecha = obtenerFechaHoy();
+  const key = `zg_enviado_${fecha}_${dni}`;
+  localStorage.setItem(key, '1');
+}
+
+function obtenerMejorPuntaje(dni) {
+  const fecha = obtenerFechaHoy();
+  const key = `zg_ranking_${fecha}`;
+  try {
+    const ranking = JSON.parse(localStorage.getItem(key)) || [];
+    const entrada = ranking.find(r => r.dni === dni);
+    return entrada ? entrada.pts : 0;
+  } catch(e) { return 0; }
+}
+
 function obtenerFechaHoy() {
   const hoy = new Date();
   return `${hoy.getFullYear()}-${hoy.getMonth()+1}-${hoy.getDate()}`;
@@ -1023,6 +1047,41 @@ function obtenerRanking() {
   const fecha = obtenerFechaHoy();
   const key = `zg_ranking_${fecha}`;
   try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; }
+}
+
+function renderizarBotonWhatsApp() {
+  const WHATSAPP_ADMIN = "541133869762";
+  const container = document.getElementById('btn-whatsapp-container');
+  const mejorPts = obtenerMejorPuntaje(dni);
+
+  if (yaEnvioHoy(dni)) {
+    container.innerHTML = `
+      <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:0.8rem 1.2rem;color:rgba(255,255,255,0.5);font-size:0.85rem;font-family:'Exo 2',sans-serif;">
+        ✅ Ya enviaste tu puntaje hoy<br/>
+        <span style="color:var(--verde-neo);font-family:'Orbitron',monospace;font-size:1rem;">${mejorPts} pts</span> registrados
+      </div>`;
+  } else {
+    container.innerHTML = `
+      <button onclick="enviarPuntajeWhatsApp()" style="width:100%;background:linear-gradient(135deg,#128c7e,#25d366);color:white;border:none;border-radius:10px;padding:0.9rem;font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 20px rgba(37,211,102,0.4);">
+        📱 ENVIAR MI PUNTAJE<br/>
+        <span style="font-size:0.7rem;opacity:0.8">Solo podés enviar 1 vez por día</span>
+      </button>`;
+  }
+}
+
+function enviarPuntajeWhatsApp() {
+  const WHATSAPP_ADMIN = "541133869762";
+  const mejorPts = obtenerMejorPuntaje(dni);
+  if (yaEnvioHoy(dni)) return;
+
+  marcarEnvioHoy(dni);
+
+  const fecha = new Date().toLocaleDateString('es-AR');
+  const msg = `🎮 *ZG SHOOTER - Puntaje del día*\n📅 Fecha: ${fecha}\n🪪 DNI: ${dni}\n🏆 Puntaje: ${mejorPts} puntos\n⚔️ Oleada máxima: ${oleada}`;
+  const url = `https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+
+  renderizarBotonWhatsApp();
 }
 
 function mostrarRankingEnPantalla(containerId) {
