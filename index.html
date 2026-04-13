@@ -471,6 +471,14 @@
   let carrito = {};
   let categoriaActual = "todos";
 
+  const emojisPorCategoria = {
+    secos: '🌾',
+    lacteos: '🥛',
+    bebidas: '🥤',
+    limpieza: '🧴',
+    higiene: '🪥'
+  };
+
   // Carga productos desde productos.csv
   async function cargarProductos() {
     try {
@@ -479,13 +487,14 @@
       const lineas = text.trim().split('\n').slice(1);
       productos = lineas.filter(l => l.trim()).map(linea => {
         const partes = linea.split(',');
+        const cat = partes[3].trim();
         return {
           id: parseInt(partes[0]),
           nombre: partes[1].trim(),
-          emoji: partes[2].trim(),
-          precio: parseInt(partes[3]),
-          cat: partes[4].trim(),
-          desc: partes[5].trim()
+          precio: parseInt(partes[2]),
+          cat: cat,
+          desc: partes[4].trim(),
+          emoji: emojisPorCategoria[cat] || '🛒'
         };
       });
       renderProductos();
