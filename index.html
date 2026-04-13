@@ -46,7 +46,6 @@
     .btn-agregar { width: 100%; background: var(--verde); color: var(--blanco); border: none; border-radius: 10px; padding: 0.5rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: background 0.2s, transform 0.1s; }
     .btn-agregar:hover { background: var(--verde-claro); color: var(--verde); transform: scale(1.02); }
 
-    /* PANEL DETALLE PRODUCTO */
     .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
     .overlay.open { display: flex; }
     .panel { background: var(--blanco); width: 100%; max-width: 520px; border-radius: 20px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; position: relative; }
@@ -63,7 +62,6 @@
     .panel-btn-agregar { width: 100%; background: var(--verde); color: var(--blanco); border: none; border-radius: 12px; padding: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
     .panel-btn-agregar:hover { background: var(--verde-claro); color: var(--verde); }
 
-    /* CARRITO */
     .overlay-carrito { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; align-items: flex-end; justify-content: center; }
     .overlay-carrito.open { display: flex; }
     .carrito-panel { background: var(--blanco); width: 100%; max-width: 480px; border-radius: 20px 20px 0 0; padding: 1.5rem; max-height: 80vh; overflow-y: auto; animation: slideUp 0.3s ease; }
@@ -161,41 +159,33 @@
 
 <script>
   const WHATSAPP_NUMBER = "541133869762";
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSv3S0-9lg6rTpkSbV5bdO-5jFbnC5agixFaFAG0pzR6cmruw8neU6tc7Vf-1Uufqj9JfDngA5YIusK/pub?gid=0&single=true&output=csv";
+
   let productos = [];
   let carrito = {};
   let categoriaActual = "todos";
-  let productoActual = null;
-
-  const emojis = {
-    secos: '\u{1F33E}',
-    lacteos: '\u{1F95B}',
-    bebidas: '\u{1F964}',
-    limpieza: '\u{1F9F4}',
-    higiene: '\u{1FAA5}'
-  };
 
   async function cargarProductos() {
     try {
-      const res = await fetch('productos.csv');
+      const res = await fetch(SHEET_URL);
       const text = await res.text();
       const lineas = text.trim().split('\n').slice(1);
       productos = lineas.filter(l => l.trim()).map(linea => {
         const partes = linea.split(',');
-        const cat = partes[3].trim();
         return {
           id: parseInt(partes[0]),
-          nombre: partes[1].trim(),
-          precio: parseInt(partes[2]),
-          cat: cat,
-          desc: partes[4] ? partes[4].trim() : '',
-          video: partes[5] ? partes[5].trim() : '',
-          emoji: emojis[cat] || '\u{1F6D2}'
+          nombre: partes[1] ? partes[1].trim() : '',
+          emoji: partes[2] ? partes[2].trim() : '',
+          precio: parseInt(partes[3]) || 0,
+          cat: partes[4] ? partes[4].trim() : '',
+          desc: partes[5] ? partes[5].trim() : '',
+          video: partes[6] ? partes[6].trim() : ''
         };
       });
       renderProductos();
     } catch (e) {
       document.getElementById('productos-grid').innerHTML =
-        '<p style="padding:2rem;color:#c00;">No se pudo cargar productos.csv</p>';
+        '<p style="padding:2rem;color:#c00;">No se pudieron cargar los productos. Verific&#225; la conexi&#243;n.</p>';
     }
   }
 
@@ -218,7 +208,6 @@
   function abrirDetalle(id) {
     const p = productos.find(x => x.id === id);
     if (!p) return;
-    productoActual = p;
 
     document.getElementById('panel-emoji').textContent = p.emoji;
     document.getElementById('panel-nombre').textContent = p.nombre;
@@ -228,11 +217,11 @@
 
     const videoEl = document.getElementById('panel-video');
     if (p.video) {
-      const videoId = obtenerVideoId(p.video);
-      if (videoId) {
-        videoEl.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '" allowfullscreen></iframe>';
+      const match = p.video.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      if (match) {
+        videoEl.innerHTML = '<iframe src="https://www.youtube.com/embed/' + match[1] + '" allowfullscreen></iframe>';
       } else {
-        videoEl.innerHTML = '<div class="panel-video-placeholder">&#x1F3A5; Link de video no v\u00E1lido</div>';
+        videoEl.innerHTML = '<div class="panel-video-placeholder">&#x1F3A5; Link no v\u00E1lido</div>';
       }
     } else {
       videoEl.innerHTML = '<div class="panel-video-placeholder">&#x1F3A5; Video pr\u00F3ximamente</div>';
@@ -244,11 +233,6 @@
     };
 
     document.getElementById('overlay-detalle').classList.add('open');
-  }
-
-  function obtenerVideoId(url) {
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    return match ? match[1] : null;
   }
 
   function cerrarDetalle() {
@@ -296,7 +280,7 @@
     const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
 
     if (ids.length === 0) {
-      items.innerHTML = '<div class="carrito-vacio">Tu carrito est\u00E1 vac\u00EDo \u{1F6D2}</div>';
+      items.innerHTML = '<div class="carrito-vacio">Tu carrito est\u00E1 vac\u00EDo &#x1F6D2;</div>';
       totalEl.textContent = '';
       return;
     }
