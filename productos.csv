@@ -1,19 +1,19 @@
-id,nombre,emoji,precio,categoria,descripcion
-1,Arroz 1kg,🌾,1200,secos,Arroz largo fino
-2,Fideos 500g,🍝,900,secos,Spaghetti n°5
-3,Harina 1kg,🌾,800,secos,Harina 0000
-4,Azúcar 1kg,🍬,750,secos,Azúcar refinada
-5,Aceite 900ml,🫙,2200,secos,Aceite de girasol
-6,Sal 500g,🧂,400,secos,Sal fina
-7,Leche entera 1L,🥛,1100,lacteos,Leche entera larga vida
-8,Yogur x4,🍶,1800,lacteos,Yogur firme natural
-9,Queso cremoso,🧀,3200,lacteos,Por kg
-10,Agua 1.5L,💧,600,bebidas,Agua mineral sin gas
-11,Gaseosa 2L,🥤,1500,bebidas,Cola / naranja
-12,Jugo en polvo,🧃,350,bebidas,Sabores varios
-13,Detergente 500ml,🧴,1100,limpieza,Limón
-14,Lavandina 1L,🫧,900,limpieza,Clásica
-15,Jabón en polvo,🫧,2500,limpieza,1kg
-16,Cepillo dental,🪥,800,higiene,Suave
-17,Jabón de manos,🧼,600,higiene,Antibacterial
-18,Papel higiénico,🧻,1400,higiene,Pack x4
+﻿"id,nombre,emoji,precio,categoria,descripcion"
+"1,Arroz 1kg,馃尵,2000,secos,Arroz largo fino"
+"2,Fideos 500g,馃崫,2000,secos,Spaghetti n掳5"
+"3,Harina 1kg,馃尵,1000,secos,Harina 0000"
+"4,Az煤car 1kg,馃崿,1000,secos,Az煤car refinada"
+"5,Aceite 900ml,馃珯,2000,secos,Aceite de girasol"
+"6,Sal 500g,馃,1000,secos,Sal fina"
+"7,Leche entera 1L,馃,1100,lacteos,Leche entera larga vida"
+"8,Yogur x4,馃嵍,1800,lacteos,Yogur firme natural"
+"9,Queso cremoso,馃,3200,lacteos,Por kg"
+"10,Agua 1.5L,馃挧,600,bebidas,Agua mineral sin gas"
+"11,Gaseosa 2L,馃イ,1500,bebidas,Cola / naranja"
+"12,Jugo en polvo,馃,350,bebidas,Sabores varios"
+"13,Detergente 500ml,馃Т,1100,limpieza,Lim贸n"
+"14,Lavandina 1L,馃,900,limpieza,Cl谩sica"
+"15,Jab贸n en polvo,馃,2500,limpieza,1kg"
+"16,Cepillo dental,馃,800,higiene,Suave"
+"17,Jab贸n de manos,馃Ъ,600,higiene,Antibacterial"
+"18,Papel higi茅nico,馃Щ,1400,higiene,Pack x4"
