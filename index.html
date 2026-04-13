@@ -7,23 +7,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --verde: #2d6a4f;
-      --verde-claro: #52b788;
-      --verde-suave: #d8f3dc;
-      --blanco: #ffffff;
-      --gris: #f4f4f0;
-      --texto: #1b1b1b;
-      --sombra: rgba(45,106,79,0.15);
+      --verde: #2d6a4f; --verde-claro: #52b788; --verde-suave: #d8f3dc;
+      --blanco: #ffffff; --gris: #f4f4f0; --texto: #1b1b1b; --sombra: rgba(45,106,79,0.15);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Nunito', sans-serif; background: var(--gris); color: var(--texto); }
 
-    header {
-      background: var(--verde); color: var(--blanco); padding: 0 2rem;
-      position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 2px 12px var(--sombra);
-      display: flex; align-items: center; justify-content: space-between; height: 70px;
-    }
+    header { background: var(--verde); color: var(--blanco); padding: 0 2rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px var(--sombra); display: flex; align-items: center; justify-content: space-between; height: 70px; }
     .logo { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
     .logo span { background: var(--verde-claro); color: var(--verde); border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
     nav a { color: var(--blanco); text-decoration: none; margin-left: 1.5rem; font-weight: 600; font-size: 0.95rem; opacity: 0.85; transition: opacity 0.2s; }
@@ -45,7 +35,7 @@
 
     .seccion-titulo { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--verde); padding: 2rem 2rem 0.5rem; }
     .productos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.2rem; padding: 1rem 2rem 2rem; }
-    .producto-card { background: var(--blanco); border-radius: 16px; box-shadow: 0 2px 12px var(--sombra); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; animation: fadeUp 0.5s ease both; }
+    .producto-card { background: var(--blanco); border-radius: 16px; box-shadow: 0 2px 12px var(--sombra); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; animation: fadeUp 0.5s ease both; cursor: pointer; }
     .producto-card:hover { transform: translateY(-5px); box-shadow: 0 8px 24px var(--sombra); }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .producto-img { width: 100%; height: 140px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; background: var(--verde-suave); }
@@ -56,10 +46,27 @@
     .btn-agregar { width: 100%; background: var(--verde); color: var(--blanco); border: none; border-radius: 10px; padding: 0.5rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: background 0.2s, transform 0.1s; }
     .btn-agregar:hover { background: var(--verde-claro); color: var(--verde); transform: scale(1.02); }
 
-    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: flex-end; justify-content: center; }
+    /* PANEL DETALLE PRODUCTO */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
     .overlay.open { display: flex; }
+    .panel { background: var(--blanco); width: 100%; max-width: 520px; border-radius: 20px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; position: relative; }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .panel-cerrar { position: absolute; top: 1rem; right: 1rem; background: var(--verde-suave); border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 1.1rem; cursor: pointer; color: var(--verde); font-weight: 700; }
+    .panel-emoji { font-size: 4rem; text-align: center; margin-bottom: 0.5rem; }
+    .panel-nombre { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--verde); text-align: center; margin-bottom: 0.3rem; }
+    .panel-cat { text-align: center; font-size: 0.8rem; color: #888; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+    .panel-desc { font-size: 0.95rem; color: #555; text-align: center; margin-bottom: 1rem; line-height: 1.6; }
+    .panel-precio { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--verde); text-align: center; margin-bottom: 1rem; }
+    .panel-video { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; }
+    .panel-video iframe { width: 100%; height: 100%; border: none; }
+    .panel-video-placeholder { color: #555; font-size: 0.85rem; text-align: center; padding: 1.5rem; }
+    .panel-btn-agregar { width: 100%; background: var(--verde); color: var(--blanco); border: none; border-radius: 12px; padding: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
+    .panel-btn-agregar:hover { background: var(--verde-claro); color: var(--verde); }
+
+    /* CARRITO */
+    .overlay-carrito { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; align-items: flex-end; justify-content: center; }
+    .overlay-carrito.open { display: flex; }
     .carrito-panel { background: var(--blanco); width: 100%; max-width: 480px; border-radius: 20px 20px 0 0; padding: 1.5rem; max-height: 80vh; overflow-y: auto; animation: slideUp 0.3s ease; }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .carrito-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
     .carrito-header h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--verde); }
     .cerrar-btn { background: var(--verde-suave); border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 1.1rem; cursor: pointer; color: var(--verde); font-weight: 700; }
@@ -114,7 +121,22 @@
 <h2 class="seccion-titulo">Nuestros Productos</h2>
 <div class="productos-grid" id="productos-grid"></div>
 
-<div class="overlay" id="overlay" onclick="cerrarSiOverlay(event)">
+<!-- PANEL DETALLE -->
+<div class="overlay" id="overlay-detalle" onclick="cerrarDetalleSiOverlay(event)">
+  <div class="panel" id="panel-detalle">
+    <button class="panel-cerrar" onclick="cerrarDetalle()">&#x2715;</button>
+    <div class="panel-emoji" id="panel-emoji"></div>
+    <div class="panel-nombre" id="panel-nombre"></div>
+    <div class="panel-cat" id="panel-cat"></div>
+    <div class="panel-desc" id="panel-desc"></div>
+    <div class="panel-precio" id="panel-precio"></div>
+    <div class="panel-video" id="panel-video"></div>
+    <button class="panel-btn-agregar" id="panel-btn-agregar">+ Agregar al carrito</button>
+  </div>
+</div>
+
+<!-- CARRITO -->
+<div class="overlay-carrito" id="overlay-carrito" onclick="cerrarCarritoSiOverlay(event)">
   <div class="carrito-panel">
     <div class="carrito-header">
       <h2>&#x1F6D2; Tu Carrito</h2>
@@ -142,6 +164,7 @@
   let productos = [];
   let carrito = {};
   let categoriaActual = "todos";
+  let productoActual = null;
 
   const emojis = {
     secos: '\u{1F33E}',
@@ -165,6 +188,7 @@
           precio: parseInt(partes[2]),
           cat: cat,
           desc: partes[4] ? partes[4].trim() : '',
+          video: partes[5] ? partes[5].trim() : '',
           emoji: emojis[cat] || '\u{1F6D2}'
         };
       });
@@ -179,16 +203,61 @@
     const grid = document.getElementById("productos-grid");
     const lista = categoriaActual === "todos" ? productos : productos.filter(p => p.cat === categoriaActual);
     grid.innerHTML = lista.map((p, i) => `
-      <div class="producto-card" style="animation-delay:${i*0.05}s">
+      <div class="producto-card" style="animation-delay:${i*0.05}s" onclick="abrirDetalle(${p.id})">
         <div class="producto-img">${p.emoji}</div>
         <div class="producto-info">
           <div class="producto-nombre">${p.nombre}</div>
           <div class="producto-desc">${p.desc}</div>
           <div class="producto-precio">$${p.precio.toLocaleString('es-AR')}</div>
-          <button class="btn-agregar" onclick="agregarAlCarrito(${p.id})">+ Agregar</button>
+          <button class="btn-agregar" onclick="event.stopPropagation();agregarAlCarrito(${p.id})">+ Agregar</button>
         </div>
       </div>
     `).join('');
+  }
+
+  function abrirDetalle(id) {
+    const p = productos.find(x => x.id === id);
+    if (!p) return;
+    productoActual = p;
+
+    document.getElementById('panel-emoji').textContent = p.emoji;
+    document.getElementById('panel-nombre').textContent = p.nombre;
+    document.getElementById('panel-cat').textContent = p.cat;
+    document.getElementById('panel-desc').textContent = p.desc;
+    document.getElementById('panel-precio').textContent = '$' + p.precio.toLocaleString('es-AR');
+
+    const videoEl = document.getElementById('panel-video');
+    if (p.video) {
+      const videoId = obtenerVideoId(p.video);
+      if (videoId) {
+        videoEl.innerHTML = '<iframe src="https://www.youtube.com/embed/' + videoId + '" allowfullscreen></iframe>';
+      } else {
+        videoEl.innerHTML = '<div class="panel-video-placeholder">&#x1F3A5; Link de video no v\u00E1lido</div>';
+      }
+    } else {
+      videoEl.innerHTML = '<div class="panel-video-placeholder">&#x1F3A5; Video pr\u00F3ximamente</div>';
+    }
+
+    document.getElementById('panel-btn-agregar').onclick = function() {
+      agregarAlCarrito(p.id);
+      cerrarDetalle();
+    };
+
+    document.getElementById('overlay-detalle').classList.add('open');
+  }
+
+  function obtenerVideoId(url) {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    return match ? match[1] : null;
+  }
+
+  function cerrarDetalle() {
+    document.getElementById('overlay-detalle').classList.remove('open');
+    document.getElementById('panel-video').innerHTML = '';
+  }
+
+  function cerrarDetalleSiOverlay(e) {
+    if (e.target === document.getElementById('overlay-detalle')) cerrarDetalle();
   }
 
   function filtrar(cat, btn) {
@@ -210,15 +279,15 @@
 
   function abrirCarrito() {
     renderCarrito();
-    document.getElementById('overlay').classList.add('open');
+    document.getElementById('overlay-carrito').classList.add('open');
   }
 
   function cerrarCarrito() {
-    document.getElementById('overlay').classList.remove('open');
+    document.getElementById('overlay-carrito').classList.remove('open');
   }
 
-  function cerrarSiOverlay(e) {
-    if (e.target === document.getElementById('overlay')) cerrarCarrito();
+  function cerrarCarritoSiOverlay(e) {
+    if (e.target === document.getElementById('overlay-carrito')) cerrarCarrito();
   }
 
   function renderCarrito() {
@@ -237,19 +306,17 @@
       const p = productos.find(x => x.id == id);
       const subtotal = p.precio * carrito[id];
       total += subtotal;
-      return `
-        <div class="carrito-item">
-          <span class="carrito-item-emoji">${p.emoji}</span>
-          <div class="carrito-item-info">
-            <div class="carrito-item-nombre">${p.nombre}</div>
-            <div class="carrito-item-precio">$${p.precio.toLocaleString('es-AR')} c/u</div>
-          </div>
-          <div class="carrito-item-controles">
-            <button class="ctrl-btn" onclick="cambiarCant(${id}, -1)">&minus;</button>
-            <span class="cant">${carrito[id]}</span>
-            <button class="ctrl-btn" onclick="cambiarCant(${id}, 1)">+</button>
-          </div>
-        </div>`;
+      return '<div class="carrito-item">' +
+        '<span class="carrito-item-emoji">' + p.emoji + '</span>' +
+        '<div class="carrito-item-info">' +
+          '<div class="carrito-item-nombre">' + p.nombre + '</div>' +
+          '<div class="carrito-item-precio">$' + p.precio.toLocaleString('es-AR') + ' c/u</div>' +
+        '</div>' +
+        '<div class="carrito-item-controles">' +
+          '<button class="ctrl-btn" onclick="cambiarCant(' + id + ', -1)">&minus;</button>' +
+          '<span class="cant">' + carrito[id] + '</span>' +
+          '<button class="ctrl-btn" onclick="cambiarCant(' + id + ', 1)">+</button>' +
+        '</div></div>';
     }).join('');
 
     totalEl.textContent = 'Total: $' + total.toLocaleString('es-AR');
