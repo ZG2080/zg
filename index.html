@@ -9,6 +9,7 @@
     :root {
       --verde: #2d6a4f; --verde-claro: #52b788; --verde-suave: #d8f3dc;
       --blanco: #ffffff; --gris: #f4f4f0; --texto: #1b1b1b; --sombra: rgba(45,106,79,0.15);
+      --rojo: #e63946; --amarillo: #f4a261;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Nunito', sans-serif; background: var(--gris); color: var(--texto); }
@@ -35,9 +36,10 @@
 
     .seccion-titulo { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--verde); padding: 2rem 2rem 0.5rem; }
     .productos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.2rem; padding: 1rem 2rem 2rem; }
-    .producto-card { background: var(--blanco); border-radius: 16px; box-shadow: 0 2px 12px var(--sombra); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; animation: fadeUp 0.5s ease both; cursor: pointer; }
+    .producto-card { background: var(--blanco); border-radius: 16px; box-shadow: 0 2px 12px var(--sombra); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; animation: fadeUp 0.5s ease both; cursor: pointer; position: relative; }
     .producto-card:hover { transform: translateY(-5px); box-shadow: 0 8px 24px var(--sombra); }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .oferta-badge { position: absolute; top: 8px; right: 8px; background: var(--rojo); color: white; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 10px; }
     .producto-img { width: 100%; height: 140px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; background: var(--verde-suave); }
     .producto-info { padding: 0.9rem; }
     .producto-nombre { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.2rem; color: var(--texto); }
@@ -46,6 +48,7 @@
     .btn-agregar { width: 100%; background: var(--verde); color: var(--blanco); border: none; border-radius: 10px; padding: 0.5rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: background 0.2s, transform 0.1s; }
     .btn-agregar:hover { background: var(--verde-claro); color: var(--verde); transform: scale(1.02); }
 
+    /* PANEL DETALLE */
     .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
     .overlay.open { display: flex; }
     .panel { background: var(--blanco); width: 100%; max-width: 520px; border-radius: 20px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; position: relative; }
@@ -55,16 +58,19 @@
     .panel-nombre { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--verde); text-align: center; margin-bottom: 0.3rem; }
     .panel-cat { text-align: center; font-size: 0.8rem; color: #888; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
     .panel-desc { font-size: 0.95rem; color: #555; text-align: center; margin-bottom: 1rem; line-height: 1.6; }
-    .panel-precio { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--verde); text-align: center; margin-bottom: 1rem; }
+    .panel-precio { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--verde); text-align: center; margin-bottom: 0.3rem; }
+    .panel-oferta-badge { text-align: center; margin-bottom: 1rem; }
+    .panel-oferta-badge span { background: var(--rojo); color: white; font-size: 0.8rem; font-weight: 700; padding: 0.25rem 0.8rem; border-radius: 12px; }
     .panel-video { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; }
     .panel-video iframe { width: 100%; height: 100%; border: none; }
     .panel-video-placeholder { color: #555; font-size: 0.85rem; text-align: center; padding: 1.5rem; }
     .panel-btn-agregar { width: 100%; background: var(--verde); color: var(--blanco); border: none; border-radius: 12px; padding: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
     .panel-btn-agregar:hover { background: var(--verde-claro); color: var(--verde); }
 
+    /* CARRITO */
     .overlay-carrito { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; align-items: flex-end; justify-content: center; }
     .overlay-carrito.open { display: flex; }
-    .carrito-panel { background: var(--blanco); width: 100%; max-width: 480px; border-radius: 20px 20px 0 0; padding: 1.5rem; max-height: 80vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+    .carrito-panel { background: var(--blanco); width: 100%; max-width: 480px; border-radius: 20px 20px 0 0; padding: 1.5rem; max-height: 85vh; overflow-y: auto; animation: slideUp 0.3s ease; }
     .carrito-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
     .carrito-header h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--verde); }
     .cerrar-btn { background: var(--verde-suave); border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 1.1rem; cursor: pointer; color: var(--verde); font-weight: 700; }
@@ -73,14 +79,60 @@
     .carrito-item-info { flex: 1; }
     .carrito-item-nombre { font-weight: 700; font-size: 0.9rem; }
     .carrito-item-precio { color: var(--verde); font-weight: 600; font-size: 0.85rem; }
+    .carrito-item-descuento { color: var(--rojo); font-size: 0.75rem; font-weight: 600; }
     .carrito-item-controles { display: flex; align-items: center; gap: 6px; }
     .ctrl-btn { background: var(--verde-suave); border: none; border-radius: 8px; width: 28px; height: 28px; font-size: 1rem; cursor: pointer; color: var(--verde); font-weight: 700; }
     .ctrl-btn:hover { background: var(--verde); color: white; }
     .cant { font-weight: 700; min-width: 20px; text-align: center; }
-    .carrito-total { margin-top: 1rem; text-align: right; font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--verde); font-weight: 700; }
+    .carrito-vacio { text-align: center; color: #aaa; padding: 2rem 0; font-size: 0.95rem; }
+
+    /* RESUMEN DE TOTALES */
+    .carrito-resumen { margin-top: 1rem; border-top: 2px solid var(--verde-suave); padding-top: 1rem; }
+    .resumen-linea { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; font-size: 0.95rem; color: #555; }
+    .resumen-linea.descuento { color: var(--rojo); font-weight: 600; }
+    .resumen-linea.fiel { color: var(--amarillo); font-weight: 600; }
+    .resumen-linea.total { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--verde); font-weight: 700; border-top: 1px solid #eee; margin-top: 0.5rem; padding-top: 0.5rem; }
+
+    /* POPUP DNI */
+    .overlay-dni { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 400; align-items: center; justify-content: center; padding: 1rem; }
+    .overlay-dni.open { display: flex; }
+    .dni-panel { background: var(--blanco); width: 100%; max-width: 400px; border-radius: 20px; padding: 2rem; animation: slideUp 0.3s ease; text-align: center; }
+    .dni-panel h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--verde); margin-bottom: 0.5rem; }
+    .dni-panel p { font-size: 0.88rem; color: #666; margin-bottom: 1.5rem; }
+    .dni-input { width: 100%; border: 2px solid var(--verde-suave); border-radius: 12px; padding: 0.8rem 1rem; font-family: 'Nunito', sans-serif; font-size: 1.1rem; text-align: center; outline: none; transition: border-color 0.2s; margin-bottom: 0.8rem; }
+    .dni-input:focus { border-color: var(--verde); }
+    .dni-error { color: var(--rojo); font-size: 0.85rem; margin-bottom: 0.8rem; min-height: 1.2rem; font-weight: 600; }
+    .dni-btn { width: 100%; background: var(--verde); color: white; border: none; border-radius: 12px; padding: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s; margin-bottom: 0.5rem; }
+    .dni-btn:hover { background: var(--verde-claro); color: var(--verde); }
+    .dni-btn-cancelar { width: 100%; background: #f0f0f0; color: #666; border: none; border-radius: 12px; padding: 0.7rem; font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+
+    /* CONFIRMACION PEDIDO */
+    .overlay-confirm { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; align-items: center; justify-content: center; padding: 1rem; }
+    .overlay-confirm.open { display: flex; }
+    .confirm-panel { background: var(--blanco); width: 100%; max-width: 460px; border-radius: 20px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+    .confirm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.8rem; border-bottom: 2px solid var(--verde-suave); }
+    .confirm-header h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--verde); }
+    .confirm-cliente { background: var(--verde-suave); border-radius: 12px; padding: 0.8rem 1rem; margin-bottom: 1rem; }
+    .confirm-cliente-nombre { font-weight: 700; font-size: 1rem; color: var(--verde); }
+    .confirm-cliente-dni { font-size: 0.8rem; color: #555; }
+    .confirm-cliente-fiel { display: inline-block; background: var(--amarillo); color: white; font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 8px; margin-left: 0.5rem; }
+    .confirm-items { margin-bottom: 1rem; }
+    .confirm-item { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+    .confirm-item-desc { color: #333; }
+    .confirm-item-precio { font-weight: 700; color: var(--verde); }
+    .confirm-item-desc-oferta { font-size: 0.75rem; color: var(--rojo); }
+    .confirm-resumen { border-top: 2px solid var(--verde-suave); padding-top: 0.8rem; }
+    .confirm-linea { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.92rem; }
+    .confirm-linea.subtotal { color: #555; }
+    .confirm-linea.descuento { color: var(--rojo); font-weight: 600; }
+    .confirm-linea.total { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--verde); border-top: 1px solid #eee; margin-top: 0.5rem; padding-top: 0.5rem; }
+    .btn-wsp { margin-top: 1.2rem; width: 100%; background: #25d366; color: white; border: none; border-radius: 12px; padding: 0.9rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
+    .btn-wsp:hover { background: #1ebe5d; }
+    .btn-volver { margin-top: 0.5rem; width: 100%; background: #f0f0f0; color: #555; border: none; border-radius: 12px; padding: 0.7rem; font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+
+    /* BOTÓN PEDIR */
     .btn-pedido { margin-top: 1rem; width: 100%; background: #25d366; color: white; border: none; border-radius: 12px; padding: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
     .btn-pedido:hover { background: #1ebe5d; }
-    .carrito-vacio { text-align: center; color: #aaa; padding: 2rem 0; font-size: 0.95rem; }
 
     footer { background: var(--verde); color: rgba(255,255,255,0.85); text-align: center; padding: 1.5rem; font-size: 0.88rem; margin-top: 2rem; }
     footer strong { color: white; }
@@ -128,6 +180,7 @@
     <div class="panel-cat" id="panel-cat"></div>
     <div class="panel-desc" id="panel-desc"></div>
     <div class="panel-precio" id="panel-precio"></div>
+    <div class="panel-oferta-badge" id="panel-oferta-badge"></div>
     <div class="panel-video" id="panel-video"></div>
     <button class="panel-btn-agregar" id="panel-btn-agregar">+ Agregar al carrito</button>
   </div>
@@ -141,11 +194,41 @@
       <button class="cerrar-btn" onclick="cerrarCarrito()">&#x2715;</button>
     </div>
     <div id="carrito-items"></div>
-    <div class="carrito-total" id="carrito-total"></div>
-    <button class="btn-pedido" onclick="enviarWhatsApp()">
+    <div class="carrito-resumen" id="carrito-resumen"></div>
+    <button class="btn-pedido" onclick="iniciarPedido()">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.564 4.14 1.545 5.876L0 24l6.335-1.52A11.953 11.953 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.374l-.36-.214-3.727.894.938-3.638-.234-.373A9.818 9.818 0 1112 21.818z"/></svg>
       Pedir por WhatsApp
     </button>
+  </div>
+</div>
+
+<!-- POPUP DNI -->
+<div class="overlay-dni" id="overlay-dni">
+  <div class="dni-panel">
+    <h3>&#x1F464; Ingres&#225; tu DNI</h3>
+    <p>Para confirmar tu pedido necesitamos identificarte.</p>
+    <input class="dni-input" id="dni-input" type="number" placeholder="Ej: 12345678" maxlength="8"/>
+    <div class="dni-error" id="dni-error"></div>
+    <button class="dni-btn" onclick="verificarDNI()">Confirmar</button>
+    <button class="dni-btn-cancelar" onclick="cerrarDNI()">Cancelar</button>
+  </div>
+</div>
+
+<!-- CONFIRMACION PEDIDO -->
+<div class="overlay-confirm" id="overlay-confirm">
+  <div class="confirm-panel">
+    <div class="confirm-header">
+      <h3>&#x1F9FE; Confirm&#225; tu pedido</h3>
+      <button class="cerrar-btn" onclick="cerrarConfirm()">&#x2715;</button>
+    </div>
+    <div id="confirm-cliente"></div>
+    <div class="confirm-items" id="confirm-items"></div>
+    <div class="confirm-resumen" id="confirm-resumen"></div>
+    <button class="btn-wsp" onclick="enviarWhatsApp()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.564 4.14 1.545 5.876L0 24l6.335-1.52A11.953 11.953 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.374l-.36-.214-3.727.894.938-3.638-.234-.373A9.818 9.818 0 1112 21.818z"/></svg>
+      Enviar pedido por WhatsApp
+    </button>
+    <button class="btn-volver" onclick="cerrarConfirm()">&#x2190; Volver al carrito</button>
   </div>
 </div>
 
@@ -159,27 +242,43 @@
 
 <script>
   const WHATSAPP_NUMBER = "541133869762";
+
+  // URL de tu planilla de PRODUCTOS (Google Sheets publicado como CSV)
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSv3S0-9lg6rTpkSbV5bdO-5jFbnC5agixFaFAG0pzR6cmruw8neU6tc7Vf-1Uufqj9JfDngA5YIusK/pub?gid=0&single=true&output=csv";
 
+  // URL de tu planilla de CLIENTES (Google Sheets publicado como CSV - solo lectura, sin datos sensibles de contacto)
+  // IMPORTANTE: Publicá esta planilla también como CSV desde Archivo > Compartir > Publicar en la web
+  const CLIENTES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRyzIRGg-tlls7PB8SsnIIIJQ4OQCRfdIs7qazlOBjqPcnPep6RR6UPI7rpceCZ_iGuLsOw3wDFwLrS/pub?gid=0&single=true&output=csv";
+
+  // CONFIGURACIÓN DE DESCUENTOS POR VOLUMEN
+  const DESC_VOLUMEN_3 = 2;   // 2% comprando 3+ unidades del mismo producto
+  const DESC_VOLUMEN_6 = 4;   // 4% comprando 6+ unidades del mismo producto
+  const DESC_FIEL = 5;        // 5% cliente fiel
+  const MONTO_FIEL = 200000;  // Gasto mensual mínimo para ser cliente fiel
+
   let productos = [];
+  let clientes = [];
   let carrito = {};
   let categoriaActual = "todos";
+  let clienteActual = null;
 
+  // ===== CARGAR DATOS =====
   async function cargarProductos() {
     try {
       const res = await fetch(SHEET_URL);
       const text = await res.text();
       const lineas = text.trim().split('\n').slice(1);
       productos = lineas.filter(l => l.trim()).map(linea => {
-        const partes = linea.split(',');
+        const partes = parsearCSV(linea);
         return {
           id: parseInt(partes[0]),
-          nombre: partes[1] ? partes[1].trim() : '',
-          emoji: partes[2] ? partes[2].trim() : '',
+          nombre: (partes[1] || '').trim(),
+          emoji: (partes[2] || '').trim(),
           precio: parseInt(partes[3]) || 0,
-          cat: partes[4] ? partes[4].trim() : '',
-          desc: partes[5] ? partes[5].trim() : '',
-          video: partes[6] ? partes[6].trim() : ''
+          cat: (partes[4] || '').trim(),
+          desc: (partes[5] || '').trim(),
+          oferta: parseInt(partes[6]) || 0,  // % de oferta del día
+          video: (partes[7] || '').trim()
         };
       });
       renderProductos();
@@ -189,11 +288,48 @@
     }
   }
 
+  async function cargarClientes() {
+    try {
+      const res = await fetch(CLIENTES_URL);
+      const text = await res.text();
+      const lineas = text.trim().split('\n').slice(1);
+      clientes = lineas.filter(l => l.trim()).map(linea => {
+        const partes = parsearCSV(linea);
+        return {
+          dni: (partes[0] || '').trim(),
+          nombre: (partes[1] || '').trim(),
+          telefono: (partes[2] || '').trim(),
+          gastoMensual: parseInt(partes[3]) || 0,
+          clienteFiel: (partes[4] || '').trim().toUpperCase() === 'SI'
+        };
+      });
+    } catch (e) {
+      console.warn('No se pudo cargar la planilla de clientes');
+    }
+  }
+
+  // Parser CSV simple que maneja comas dentro de comillas
+  function parsearCSV(linea) {
+    const resultado = [];
+    let actual = '';
+    let dentroComillas = false;
+    for (let i = 0; i < linea.length; i++) {
+      const c = linea[i];
+      if (c === '"') { dentroComillas = !dentroComillas; }
+      else if (c === ',' && !dentroComillas) { resultado.push(actual); actual = ''; }
+      else { actual += c; }
+    }
+    resultado.push(actual);
+    return resultado;
+  }
+
+  // ===== RENDER PRODUCTOS =====
   function renderProductos() {
     const grid = document.getElementById("productos-grid");
     const lista = categoriaActual === "todos" ? productos : productos.filter(p => p.cat === categoriaActual);
     grid.innerHTML = lista.map((p, i) => `
       <div class="producto-card" style="animation-delay:${i*0.05}s" onclick="abrirDetalle(${p.id})">
+        ${p.oferta > 0 ? `<div class="oferta-badge">&#x1F525; ${p.oferta}% OFF</div>` : ''}
         <div class="producto-img">${p.emoji}</div>
         <div class="producto-info">
           <div class="producto-nombre">${p.nombre}</div>
@@ -205,15 +341,17 @@
     `).join('');
   }
 
+  // ===== DETALLE PRODUCTO =====
   function abrirDetalle(id) {
     const p = productos.find(x => x.id === id);
     if (!p) return;
-
     document.getElementById('panel-emoji').textContent = p.emoji;
     document.getElementById('panel-nombre').textContent = p.nombre;
     document.getElementById('panel-cat').textContent = p.cat;
     document.getElementById('panel-desc').textContent = p.desc;
     document.getElementById('panel-precio').textContent = '$' + p.precio.toLocaleString('es-AR');
+    document.getElementById('panel-oferta-badge').innerHTML = p.oferta > 0
+      ? `<span>&#x1F525; Oferta del d&#237;a: ${p.oferta}% OFF</span>` : '';
 
     const videoEl = document.getElementById('panel-video');
     if (p.video) {
@@ -226,12 +364,9 @@
     } else {
       videoEl.innerHTML = '<div class="panel-video-placeholder">&#x1F3A5; Video pr\u00F3ximamente</div>';
     }
-
     document.getElementById('panel-btn-agregar').onclick = function() {
-      agregarAlCarrito(p.id);
-      cerrarDetalle();
+      agregarAlCarrito(p.id); cerrarDetalle();
     };
-
     document.getElementById('overlay-detalle').classList.add('open');
   }
 
@@ -251,6 +386,7 @@
     renderProductos();
   }
 
+  // ===== CARRITO =====
   function agregarAlCarrito(id) {
     carrito[id] = (carrito[id] || 0) + 1;
     actualizarContador();
@@ -276,34 +412,53 @@
 
   function renderCarrito() {
     const items = document.getElementById('carrito-items');
-    const totalEl = document.getElementById('carrito-total');
+    const resumen = document.getElementById('carrito-resumen');
     const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
 
     if (ids.length === 0) {
       items.innerHTML = '<div class="carrito-vacio">Tu carrito est\u00E1 vac\u00EDo &#x1F6D2;</div>';
-      totalEl.textContent = '';
+      resumen.innerHTML = '';
       return;
     }
 
-    let total = 0;
+    let subtotal = 0;
     items.innerHTML = ids.map(id => {
       const p = productos.find(x => x.id == id);
-      const subtotal = p.precio * carrito[id];
-      total += subtotal;
+      const cant = carrito[id];
+      const sub = p.precio * cant;
+      subtotal += sub;
+
+      // Descuento volumen por item
+      let descVolumen = 0;
+      if (cant >= 6) descVolumen = DESC_VOLUMEN_6;
+      else if (cant >= 3) descVolumen = DESC_VOLUMEN_3;
+
+      const descInfo = descVolumen > 0 ? `<div class="carrito-item-descuento">&#x2193; ${descVolumen}% desc. por volumen</div>` : '';
+      const ofertaInfo = p.oferta > 0 ? `<div class="carrito-item-descuento">&#x1F525; ${p.oferta}% oferta del d&#237;a</div>` : '';
+
       return '<div class="carrito-item">' +
         '<span class="carrito-item-emoji">' + p.emoji + '</span>' +
         '<div class="carrito-item-info">' +
           '<div class="carrito-item-nombre">' + p.nombre + '</div>' +
-          '<div class="carrito-item-precio">$' + p.precio.toLocaleString('es-AR') + ' c/u</div>' +
+          '<div class="carrito-item-precio">$' + p.precio.toLocaleString('es-AR') + ' c/u &times; ' + cant + '</div>' +
+          ofertaInfo + descInfo +
         '</div>' +
         '<div class="carrito-item-controles">' +
           '<button class="ctrl-btn" onclick="cambiarCant(' + id + ', -1)">&minus;</button>' +
-          '<span class="cant">' + carrito[id] + '</span>' +
+          '<span class="cant">' + cant + '</span>' +
           '<button class="ctrl-btn" onclick="cambiarCant(' + id + ', 1)">+</button>' +
         '</div></div>';
     }).join('');
 
-    totalEl.textContent = 'Total: $' + total.toLocaleString('es-AR');
+    // Calcular totales simplificados para vista del carrito
+    const totales = calcularTotales(clienteActual);
+    resumen.innerHTML = `
+      <div class="resumen-linea subtotal"><span>Subtotal</span><span>$${totales.subtotal.toLocaleString('es-AR')}</span></div>
+      ${totales.descOferta > 0 ? `<div class="resumen-linea descuento"><span>&#x1F525; Oferta del d&#237;a</span><span>-$${totales.descOferta.toLocaleString('es-AR')}</span></div>` : ''}
+      ${totales.descVolumen > 0 ? `<div class="resumen-linea descuento"><span>&#x2193; Desc. por volumen</span><span>-$${totales.descVolumen.toLocaleString('es-AR')}</span></div>` : ''}
+      ${totales.descFiel > 0 ? `<div class="resumen-linea fiel"><span>&#x2B50; Cliente fiel (5%)</span><span>-$${totales.descFiel.toLocaleString('es-AR')}</span></div>` : ''}
+      <div class="resumen-linea total"><span>Total</span><span>$${totales.total.toLocaleString('es-AR')}</span></div>
+    `;
   }
 
   function cambiarCant(id, delta) {
@@ -313,22 +468,191 @@
     renderCarrito();
   }
 
-  function enviarWhatsApp() {
+  // ===== CÁLCULO DE DESCUENTOS =====
+  function calcularTotales(cliente) {
     const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
-    if (ids.length === 0) { alert("Tu carrito est\u00E1 vac\u00EDo."); return; }
-    let msg = "Hola ZG! Quiero hacer el siguiente pedido:\n\n";
-    let total = 0;
+    const esFiel = cliente && cliente.clienteFiel;
+
+    let subtotal = 0;
+    let descOferta = 0;
+    let descVolumen = 0;
+
     ids.forEach(id => {
       const p = productos.find(x => x.id == id);
-      const sub = p.precio * carrito[id];
-      total += sub;
-      msg += "- " + p.nombre + " x" + carrito[id] + " = $" + sub.toLocaleString('es-AR') + "\n";
+      const cant = carrito[id];
+      const precioBase = p.precio * cant;
+      subtotal += precioBase;
+
+      // Oferta del día (acumula con todo)
+      if (p.oferta > 0) {
+        descOferta += Math.round(precioBase * p.oferta / 100);
+      }
+
+      // Descuento por volumen (NO acumula con cliente fiel)
+      if (!esFiel) {
+        let pct = 0;
+        if (cant >= 6) pct = DESC_VOLUMEN_6;
+        else if (cant >= 3) pct = DESC_VOLUMEN_3;
+        if (pct > 0) {
+          descVolumen += Math.round(precioBase * pct / 100);
+        }
+      }
     });
-    msg += "\nTotal: $" + total.toLocaleString('es-AR');
+
+    // Descuento cliente fiel (sobre subtotal - oferta)
+    let descFiel = 0;
+    if (esFiel) {
+      const baseParaFiel = subtotal - descOferta;
+      descFiel = Math.round(baseParaFiel * DESC_FIEL / 100);
+    }
+
+    const total = subtotal - descOferta - descVolumen - descFiel;
+    return { subtotal, descOferta, descVolumen, descFiel, total };
+  }
+
+  // ===== FLUJO DNI =====
+  function iniciarPedido() {
+    const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
+    if (ids.length === 0) { alert("Tu carrito est\u00E1 vac\u00EDo."); return; }
+    cerrarCarrito();
+    document.getElementById('dni-input').value = '';
+    document.getElementById('dni-error').textContent = '';
+    document.getElementById('overlay-dni').classList.add('open');
+    setTimeout(() => document.getElementById('dni-input').focus(), 300);
+  }
+
+  function cerrarDNI() {
+    document.getElementById('overlay-dni').classList.remove('open');
+  }
+
+  async function verificarDNI() {
+    const dni = document.getElementById('dni-input').value.trim();
+    const errorEl = document.getElementById('dni-error');
+
+    if (!dni || dni.length < 7) {
+      errorEl.textContent = 'Ingres\u00E1 un DNI v\u00E1lido.';
+      return;
+    }
+
+    errorEl.textContent = 'Verificando...';
+
+    // Si los clientes no cargaron aún, intentar cargar
+    if (clientes.length === 0) await cargarClientes();
+
+    const cliente = clientes.find(c => c.dni === dni);
+    if (!cliente) {
+      errorEl.textContent = '&#x274C; DNI no registrado. Consult\u00E1 con el almac\u00E9n.';
+      return;
+    }
+
+    clienteActual = cliente;
+    errorEl.textContent = '';
+    cerrarDNI();
+    mostrarConfirmacion(cliente);
+  }
+
+  // Enter en el input de DNI
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('dni-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') verificarDNI();
+    });
+  });
+
+  // ===== CONFIRMACIÓN =====
+  function mostrarConfirmacion(cliente) {
+    const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
+    const totales = calcularTotales(cliente);
+
+    // Header cliente
+    document.getElementById('confirm-cliente').innerHTML = `
+      <div class="confirm-cliente">
+        <div class="confirm-cliente-nombre">
+          &#x1F464; ${cliente.nombre}
+          ${cliente.clienteFiel ? '<span class="confirm-cliente-fiel">&#x2B50; Cliente Fiel</span>' : ''}
+        </div>
+        <div class="confirm-cliente-dni">DNI: ${cliente.dni}</div>
+      </div>
+    `;
+
+    // Items
+    document.getElementById('confirm-items').innerHTML = ids.map(id => {
+      const p = productos.find(x => x.id == id);
+      const cant = carrito[id];
+      const precioBase = p.precio * cant;
+
+      let descuento = 0;
+      let descInfo = '';
+
+      if (p.oferta > 0) {
+        const d = Math.round(precioBase * p.oferta / 100);
+        descuento += d;
+        descInfo += `<div class="confirm-item-desc-oferta">&#x1F525; Oferta ${p.oferta}%: -$${d.toLocaleString('es-AR')}</div>`;
+      }
+
+      if (!cliente.clienteFiel) {
+        let pct = 0;
+        if (cant >= 6) pct = DESC_VOLUMEN_6;
+        else if (cant >= 3) pct = DESC_VOLUMEN_3;
+        if (pct > 0) {
+          const d = Math.round(precioBase * pct / 100);
+          descuento += d;
+          descInfo += `<div class="confirm-item-desc-oferta">&#x2193; Vol. ${pct}%: -$${d.toLocaleString('es-AR')}</div>`;
+        }
+      }
+
+      const precioFinal = precioBase - descuento;
+      return `<div class="confirm-item">
+        <div>
+          <div class="confirm-item-desc">${p.emoji} ${p.nombre} x${cant}</div>
+          ${descInfo}
+        </div>
+        <div class="confirm-item-precio">$${precioFinal.toLocaleString('es-AR')}</div>
+      </div>`;
+    }).join('');
+
+    // Resumen
+    document.getElementById('confirm-resumen').innerHTML = `
+      <div class="confirm-linea subtotal"><span>Subtotal</span><span>$${totales.subtotal.toLocaleString('es-AR')}</span></div>
+      ${totales.descOferta > 0 ? `<div class="confirm-linea descuento"><span>&#x1F525; Ofertas del d&#237;a</span><span>-$${totales.descOferta.toLocaleString('es-AR')}</span></div>` : ''}
+      ${totales.descVolumen > 0 ? `<div class="confirm-linea descuento"><span>&#x2193; Desc. volumen</span><span>-$${totales.descVolumen.toLocaleString('es-AR')}</span></div>` : ''}
+      ${totales.descFiel > 0 ? `<div class="confirm-linea descuento fiel"><span>&#x2B50; Cliente fiel (5%)</span><span>-$${totales.descFiel.toLocaleString('es-AR')}</span></div>` : ''}
+      <div class="confirm-linea total"><span>Total</span><span>$${totales.total.toLocaleString('es-AR')}</span></div>
+    `;
+
+    document.getElementById('overlay-confirm').classList.add('open');
+  }
+
+  function cerrarConfirm() {
+    document.getElementById('overlay-confirm').classList.remove('open');
+  }
+
+  // ===== WHATSAPP =====
+  function enviarWhatsApp() {
+    if (!clienteActual) return;
+    const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
+    const totales = calcularTotales(clienteActual);
+
+    let msg = `Hola ZG! Soy ${clienteActual.nombre} (DNI: ${clienteActual.dni})\n`;
+    msg += `Quiero hacer el siguiente pedido:\n\n`;
+
+    ids.forEach(id => {
+      const p = productos.find(x => x.id == id);
+      const cant = carrito[id];
+      msg += `- ${p.nombre} x${cant} = $${(p.precio * cant).toLocaleString('es-AR')}\n`;
+    });
+
+    msg += `\nSubtotal: $${totales.subtotal.toLocaleString('es-AR')}`;
+    if (totales.descOferta > 0) msg += `\nOfertas del d\u00EDa: -$${totales.descOferta.toLocaleString('es-AR')}`;
+    if (totales.descVolumen > 0) msg += `\nDesc. volumen: -$${totales.descVolumen.toLocaleString('es-AR')}`;
+    if (totales.descFiel > 0) msg += `\nCliente fiel (5%): -$${totales.descFiel.toLocaleString('es-AR')}`;
+    msg += `\n*TOTAL: $${totales.total.toLocaleString('es-AR')}*`;
+
     window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
   }
 
+  // ===== INIT =====
   cargarProductos();
+  cargarClientes();
 </script>
 </body>
 </html>
