@@ -248,7 +248,7 @@
 
   // URL de tu planilla de CLIENTES (Google Sheets publicado como CSV - solo lectura, sin datos sensibles de contacto)
   // IMPORTANTE: Publicá esta planilla también como CSV desde Archivo > Compartir > Publicar en la web
-  const CLIENTES_URL = "https://script.google.com/macros/s/AKfycbywV1057ONdbYzecs-t00OpXn2MFH1RRdBzbKoOrxsx0nzHChIPxazAVSZ4rr1P9mW1ZA/exec";
+  const CLIENTES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRyzIRGg-tlls7PB8SsnIIIJQ4OQCRfdIs7qazlOBjqPcnPep6RR6UPI7rpceCZ_iGuLsOw3wDFwLrS/pub?gid=0&single=true&output=csv";
 
   // CONFIGURACIÓN DE DESCUENTOS POR VOLUMEN
   const DESC_VOLUMEN_3 = 2;   // 2% comprando 3+ unidades del mismo producto
@@ -291,14 +291,18 @@
   async function cargarClientes() {
     try {
       const res = await fetch(CLIENTES_URL);
-      const data = await res.json();
-      clientes = data.map(fila => ({
-        dni: (fila.dni || '').toString().trim(),
-        nombre: (fila.nombre || '').trim(),
-        telefono: (fila.telefono || '').trim(),
-        gastoMensual: parseInt(fila.gastoMensual) || 0,
-        clienteFiel: (fila.clienteFiel || '').toString().toUpperCase() === 'SI'
-      }));
+      const text = await res.text();
+      const lineas = text.trim().split('\n').slice(1);
+      clientes = lineas.filter(l => l.trim()).map(linea => {
+        const partes = parsearCSV(linea);
+        return {
+          dni: (partes[0] || '').trim(),
+          nombre: (partes[1] || '').trim(),
+          telefono: (partes[2] || '').trim(),
+          gastoMensual: parseInt(partes[3]) || 0,
+          clienteFiel: (partes[4] || '').trim().toUpperCase() === 'SI'
+        };
+      });
     } catch (e) {
       console.warn('No se pudo cargar la planilla de clientes');
     }
