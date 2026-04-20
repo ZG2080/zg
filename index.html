@@ -21,6 +21,22 @@
     nav a:hover { opacity: 1; }
     .carrito-btn { background: var(--verde-claro); color: var(--verde); border: none; border-radius: 25px; padding: 0.4rem 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s, transform 0.1s; }
     .carrito-btn:hover { background: #74c69d; transform: scale(1.04); }
+    .vip-btn { background: linear-gradient(135deg, #f4a261, #e76f51); color: white; border: none; border-radius: 25px; padding: 0.4rem 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: opacity 0.2s, transform 0.1s; white-space: nowrap; }
+    .vip-btn:hover { opacity: 0.9; transform: scale(1.04); }
+    .juego-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 25px; padding: 0.4rem 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; transition: background 0.2s, transform 0.1s; }
+    .juego-btn:hover { background: rgba(255,255,255,0.25); transform: scale(1.04); }
+    .header-btns { display: flex; align-items: center; gap: 0.6rem; }
+
+    /* PANEL VIP */
+    .overlay-vip { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 400; align-items: center; justify-content: center; padding: 1rem; }
+    .overlay-vip.open { display: flex; }
+    .vip-panel { background: var(--blanco); width: 100%; max-width: 400px; border-radius: 20px; padding: 2rem; animation: slideUp 0.3s ease; text-align: center; }
+    .vip-panel h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--verde); margin-bottom: 0.3rem; }
+    .vip-panel p { font-size: 0.88rem; color: #666; margin-bottom: 1.5rem; }
+    .vip-badge-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+    .vip-activo-info { background: linear-gradient(135deg, #f4a261, #e76f51); color: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; font-weight: 700; }
+    .vip-activo-nombre { font-size: 1.1rem; margin-bottom: 0.3rem; }
+    .vip-activo-desc { font-size: 0.85rem; opacity: 0.9; }
 
     .hero { background: linear-gradient(135deg, var(--verde) 0%, var(--verde-claro) 100%); color: var(--blanco); text-align: center; padding: 4rem 2rem 3rem; position: relative; overflow: hidden; }
     .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 280px; height: 280px; background: rgba(255,255,255,0.07); border-radius: 50%; }
@@ -148,9 +164,11 @@
     <a href="#">Productos</a>
     <a href="https://wa.me/541133869762" target="_blank">Contacto</a>
   </nav>
-  <button class="carrito-btn" onclick="abrirCarrito()">
-    &#x1F6D2; Carrito <span id="carrito-count">0</span>
-  </button>
+  <div class="header-btns">
+    <button class="vip-btn" id="vip-btn" onclick="abrirVIP()">&#x2B50; VIP</button>
+    <a class="juego-btn" href="juego.html">&#x1F3AE; Jugar</a>
+    <button class="carrito-btn" onclick="abrirCarrito()">&#x1F6D2; Carrito <span id="carrito-count">0</span></button>
+  </div>
 </header>
 
 <section class="hero">
@@ -202,18 +220,6 @@
   </div>
 </div>
 
-<!-- POPUP DNI -->
-<div class="overlay-dni" id="overlay-dni">
-  <div class="dni-panel">
-    <h3>&#x1F464; Ingres&#225; tu DNI</h3>
-    <p>Para confirmar tu pedido necesitamos identificarte.</p>
-    <input class="dni-input" id="dni-input" type="number" placeholder="Ej: 12345678" maxlength="8"/>
-    <div class="dni-error" id="dni-error"></div>
-    <button class="dni-btn" onclick="verificarDNI()">Confirmar</button>
-    <button class="dni-btn-cancelar" onclick="cerrarDNI()">Cancelar</button>
-  </div>
-</div>
-
 <!-- CONFIRMACION PEDIDO -->
 <div class="overlay-confirm" id="overlay-confirm">
   <div class="confirm-panel">
@@ -232,13 +238,27 @@
   </div>
 </div>
 
+<!-- PANEL VIP -->
+<div class="overlay-vip" id="overlay-vip">
+  <div class="vip-panel">
+    <div class="vip-badge-icon">&#x2B50;</div>
+    <h3>Zona VIP</h3>
+    <p id="vip-panel-desc">Ingres&#225; tu DNI para acceder a tus beneficios exclusivos.</p>
+    <div id="vip-activo-info" style="display:none" class="vip-activo-info">
+      <div class="vip-activo-nombre" id="vip-activo-nombre"></div>
+      <div class="vip-activo-desc">&#x2B50; Cliente VIP &mdash; 5% de descuento aplicado</div>
+    </div>
+    <input class="dni-input" id="vip-dni-input" type="number" placeholder="Ej: 12345678"/>
+    <div class="dni-error" id="vip-error"></div>
+    <button class="dni-btn" id="vip-confirmar-btn" onclick="verificarVIP()">&#x2B50; Ingresar como VIP</button>
+    <button class="dni-btn-cancelar" onclick="cerrarVIP()">Cerrar</button>
+  </div>
+</div>
+
 <footer>
   <strong>ZG Almac&#233;n</strong> &#x2014; Tu almac&#233;n de confianza &#x1F33F;<br/>
   <small>Hac&#233; tu pedido y te contactamos a la brevedad.</small>
 </footer>
-
-<a href="juego.html" style="position:fixed;bottom:1.5rem;right:1.5rem;background:linear-gradient(135deg,#2d6a4f,#52b788);color:white;text-decoration:none;border-radius:50px;padding:0.8rem 1.4rem;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.95rem;box-shadow:0 4px 20px rgba(82,183,136,0.5);z-index:999;display:flex;align-items:center;gap:8px;animation:bounce 2s ease-in-out infinite;">&#x1F3AE; &#xA1;Jug&#225; y gan&#225;!</a>
-<style>@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}</style>
 
 <script>
   const WHATSAPP_NUMBER = "541133869762";
@@ -248,7 +268,7 @@
 
   // URL de tu planilla de CLIENTES (Google Sheets publicado como CSV - solo lectura, sin datos sensibles de contacto)
   // IMPORTANTE: Publicá esta planilla también como CSV desde Archivo > Compartir > Publicar en la web
-  const CLIENTES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRyzIRGg-tlls7PB8SsnIIIJQ4OQCRfdIs7qazlOBjqPcnPep6RR6UPI7rpceCZ_iGuLsOw3wDFwLrS/pub?gid=0&single=true&output=csv";
+  const CLIENTES_URL = "https://zg-clientes.flz2080flz2080.workers.dev";
 
   // CONFIGURACIÓN DE DESCUENTOS POR VOLUMEN
   const DESC_VOLUMEN_3 = 2;   // 2% comprando 3+ unidades del mismo producto
@@ -291,18 +311,14 @@
   async function cargarClientes() {
     try {
       const res = await fetch(CLIENTES_URL);
-      const text = await res.text();
-      const lineas = text.trim().split('\n').slice(1);
-      clientes = lineas.filter(l => l.trim()).map(linea => {
-        const partes = parsearCSV(linea);
-        return {
-          dni: (partes[0] || '').trim(),
-          nombre: (partes[1] || '').trim(),
-          telefono: (partes[2] || '').trim(),
-          gastoMensual: parseInt(partes[3]) || 0,
-          clienteFiel: (partes[4] || '').trim().toUpperCase() === 'SI'
-        };
-      });
+      const data = await res.json();
+      clientes = data.map(fila => ({
+        dni: (fila.dni || '').toString().trim(),
+        nombre: (fila.nombre || '').trim(),
+        telefono: (fila.telefono || '').trim(),
+        gastoMensual: parseInt(fila.gastoMensual) || 0,
+        clienteFiel: (fila.clienteFiel || '').toString().toUpperCase() === 'SI'
+      }));
     } catch (e) {
       console.warn('No se pudo cargar la planilla de clientes');
     }
@@ -488,7 +504,7 @@
         descOferta += Math.round(precioBase * p.oferta / 100);
       }
 
-      // Descuento por volumen (NO acumula con cliente fiel)
+      // Descuento por volumen (NO acumula con cliente fiel, reemplaza no suma)
       if (!esFiel) {
         let pct = 0;
         if (cant >= 6) pct = DESC_VOLUMEN_6;
@@ -510,24 +526,41 @@
     return { subtotal, descOferta, descVolumen, descFiel, total };
   }
 
-  // ===== FLUJO DNI =====
+  // ===== FLUJO PEDIDO =====
   function iniciarPedido() {
     const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
     if (ids.length === 0) { alert("Tu carrito est\u00E1 vac\u00EDo."); return; }
     cerrarCarrito();
-    document.getElementById('dni-input').value = '';
-    document.getElementById('dni-error').textContent = '';
-    document.getElementById('overlay-dni').classList.add('open');
-    setTimeout(() => document.getElementById('dni-input').focus(), 300);
+    // Si es VIP ya está identificado, sino va directo sin cliente
+    mostrarConfirmacion(clienteActual);
   }
 
-  function cerrarDNI() {
-    document.getElementById('overlay-dni').classList.remove('open');
+  // ===== PANEL VIP =====
+  function abrirVIP() {
+    if (clienteActual && clienteActual.clienteFiel) {
+      document.getElementById('vip-activo-info').style.display = 'block';
+      document.getElementById('vip-activo-nombre').textContent = '\u{1F464} ' + clienteActual.nombre;
+      document.getElementById('vip-dni-input').style.display = 'none';
+      document.getElementById('vip-confirmar-btn').style.display = 'none';
+      document.getElementById('vip-panel-desc').style.display = 'none';
+    } else {
+      document.getElementById('vip-activo-info').style.display = 'none';
+      document.getElementById('vip-dni-input').style.display = 'block';
+      document.getElementById('vip-confirmar-btn').style.display = 'block';
+      document.getElementById('vip-panel-desc').style.display = 'block';
+      document.getElementById('vip-dni-input').value = '';
+      document.getElementById('vip-error').textContent = '';
+    }
+    document.getElementById('overlay-vip').classList.add('open');
   }
 
-  async function verificarDNI() {
-    const dni = document.getElementById('dni-input').value.trim();
-    const errorEl = document.getElementById('dni-error');
+  function cerrarVIP() {
+    document.getElementById('overlay-vip').classList.remove('open');
+  }
+
+  async function verificarVIP() {
+    const dni = document.getElementById('vip-dni-input').value.trim();
+    const errorEl = document.getElementById('vip-error');
 
     if (!dni || dni.length < 7) {
       errorEl.textContent = 'Ingres\u00E1 un DNI v\u00E1lido.';
@@ -535,26 +568,28 @@
     }
 
     errorEl.textContent = 'Verificando...';
-
-    // Si los clientes no cargaron aún, intentar cargar
     if (clientes.length === 0) await cargarClientes();
 
     const cliente = clientes.find(c => c.dni === dni);
     if (!cliente) {
-      errorEl.textContent = '&#x274C; DNI no registrado. Consult\u00E1 con el almac\u00E9n.';
+      errorEl.textContent = '\u274C DNI no registrado.';
+      return;
+    }
+    if (!cliente.clienteFiel) {
+      errorEl.textContent = '\u274C No ten\u00E9s beneficios VIP todav\u00EDa.';
       return;
     }
 
     clienteActual = cliente;
-    errorEl.textContent = '';
-    cerrarDNI();
-    mostrarConfirmacion(cliente);
+    const btn = document.getElementById('vip-btn');
+    btn.textContent = '\u2B50 ' + cliente.nombre;
+    cerrarVIP();
+    renderCarrito();
   }
 
-  // Enter en el input de DNI
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('dni-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') verificarDNI();
+    document.getElementById('vip-dni-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') verificarVIP();
     });
   });
 
@@ -564,15 +599,18 @@
     const totales = calcularTotales(cliente);
 
     // Header cliente
-    document.getElementById('confirm-cliente').innerHTML = `
-      <div class="confirm-cliente">
-        <div class="confirm-cliente-nombre">
-          &#x1F464; ${cliente.nombre}
-          ${cliente.clienteFiel ? '<span class="confirm-cliente-fiel">&#x2B50; Cliente Fiel</span>' : ''}
+    if (cliente && cliente.clienteFiel) {
+      document.getElementById('confirm-cliente').innerHTML = `
+        <div class="confirm-cliente">
+          <div class="confirm-cliente-nombre">
+            &#x1F464; ${cliente.nombre}
+            <span class="confirm-cliente-fiel">&#x2B50; VIP</span>
+          </div>
         </div>
-        <div class="confirm-cliente-dni">DNI: ${cliente.dni}</div>
-      </div>
-    `;
+      `;
+    } else {
+      document.getElementById('confirm-cliente').innerHTML = '';
+    }
 
     // Items
     document.getElementById('confirm-items').innerHTML = ids.map(id => {
@@ -589,7 +627,7 @@
         descInfo += `<div class="confirm-item-desc-oferta">&#x1F525; Oferta ${p.oferta}%: -$${d.toLocaleString('es-AR')}</div>`;
       }
 
-      if (!cliente.clienteFiel) {
+      if (!cliente || !cliente.clienteFiel) {
         let pct = 0;
         if (cant >= 6) pct = DESC_VOLUMEN_6;
         else if (cant >= 3) pct = DESC_VOLUMEN_3;
@@ -615,7 +653,7 @@
       <div class="confirm-linea subtotal"><span>Subtotal</span><span>$${totales.subtotal.toLocaleString('es-AR')}</span></div>
       ${totales.descOferta > 0 ? `<div class="confirm-linea descuento"><span>&#x1F525; Ofertas del d&#237;a</span><span>-$${totales.descOferta.toLocaleString('es-AR')}</span></div>` : ''}
       ${totales.descVolumen > 0 ? `<div class="confirm-linea descuento"><span>&#x2193; Desc. volumen</span><span>-$${totales.descVolumen.toLocaleString('es-AR')}</span></div>` : ''}
-      ${totales.descFiel > 0 ? `<div class="confirm-linea descuento fiel"><span>&#x2B50; Cliente fiel (5%)</span><span>-$${totales.descFiel.toLocaleString('es-AR')}</span></div>` : ''}
+      ${totales.descFiel > 0 ? `<div class="confirm-linea descuento fiel"><span>&#x2B50; VIP (5%)</span><span>-$${totales.descFiel.toLocaleString('es-AR')}</span></div>` : ''}
       <div class="confirm-linea total"><span>Total</span><span>$${totales.total.toLocaleString('es-AR')}</span></div>
     `;
 
@@ -628,12 +666,12 @@
 
   // ===== WHATSAPP =====
   function enviarWhatsApp() {
-    if (!clienteActual) return;
     const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
     const totales = calcularTotales(clienteActual);
 
-    let msg = `Hola ZG! Soy ${clienteActual.nombre} (DNI: ${clienteActual.dni})\n`;
-    msg += `Quiero hacer el siguiente pedido:\n\n`;
+    let msg = clienteActual && clienteActual.clienteFiel
+      ? `Hola ZG! Soy ${clienteActual.nombre} &#x2B50; VIP\nQuiero hacer el siguiente pedido:\n\n`
+      : `Hola ZG! Quiero hacer el siguiente pedido:\n\n`;
 
     ids.forEach(id => {
       const p = productos.find(x => x.id == id);
@@ -644,7 +682,7 @@
     msg += `\nSubtotal: $${totales.subtotal.toLocaleString('es-AR')}`;
     if (totales.descOferta > 0) msg += `\nOfertas del d\u00EDa: -$${totales.descOferta.toLocaleString('es-AR')}`;
     if (totales.descVolumen > 0) msg += `\nDesc. volumen: -$${totales.descVolumen.toLocaleString('es-AR')}`;
-    if (totales.descFiel > 0) msg += `\nCliente fiel (5%): -$${totales.descFiel.toLocaleString('es-AR')}`;
+    if (totales.descFiel > 0) msg += `\nDescuento VIP (5%): -$${totales.descFiel.toLocaleString('es-AR')}`;
     msg += `\n*TOTAL: $${totales.total.toLocaleString('es-AR')}*`;
 
     window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
