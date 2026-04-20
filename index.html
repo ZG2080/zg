@@ -21,6 +21,23 @@
     nav a:hover { opacity: 1; }
     .carrito-btn { background: var(--verde-claro); color: var(--verde); border: none; border-radius: 25px; padding: 0.4rem 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s, transform 0.1s; }
     .carrito-btn:hover { background: #74c69d; transform: scale(1.04); }
+    .vip-btn { background: linear-gradient(135deg, #f4a261, #e76f51); color: white; border: none; border-radius: 25px; padding: 0.4rem 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: opacity 0.2s, transform 0.1s; }
+    .vip-btn:hover { opacity: 0.9; transform: scale(1.04); }
+    .vip-btn.activo { background: linear-gradient(135deg, #f4a261, #e76f51); box-shadow: 0 0 0 3px rgba(244,162,97,0.4); }
+    .juego-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 25px; padding: 0.4rem 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; transition: background 0.2s, transform 0.1s; }
+    .juego-btn:hover { background: rgba(255,255,255,0.25); transform: scale(1.04); }
+    .header-btns { display: flex; align-items: center; gap: 0.6rem; }
+
+    /* PANEL VIP */
+    .overlay-vip { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 400; align-items: center; justify-content: center; padding: 1rem; }
+    .overlay-vip.open { display: flex; }
+    .vip-panel { background: var(--blanco); width: 100%; max-width: 400px; border-radius: 20px; padding: 2rem; animation: slideUp 0.3s ease; text-align: center; }
+    .vip-panel h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--verde); margin-bottom: 0.3rem; }
+    .vip-panel p { font-size: 0.88rem; color: #666; margin-bottom: 1.5rem; }
+    .vip-badge { display: inline-block; background: linear-gradient(135deg, #f4a261, #e76f51); color: white; font-size: 2rem; width: 60px; height: 60px; border-radius: 50%; line-height: 60px; margin-bottom: 1rem; }
+    .vip-activo-info { background: linear-gradient(135deg, #f4a261, #e76f51); color: white; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; font-weight: 700; }
+    .vip-activo-nombre { font-size: 1.1rem; margin-bottom: 0.3rem; }
+    .vip-activo-desc { font-size: 0.85rem; opacity: 0.9; }
 
     .hero { background: linear-gradient(135deg, var(--verde) 0%, var(--verde-claro) 100%); color: var(--blanco); text-align: center; padding: 4rem 2rem 3rem; position: relative; overflow: hidden; }
     .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 280px; height: 280px; background: rgba(255,255,255,0.07); border-radius: 50%; }
@@ -148,9 +165,11 @@
     <a href="#">Productos</a>
     <a href="https://wa.me/541133869762" target="_blank">Contacto</a>
   </nav>
-  <button class="carrito-btn" onclick="abrirCarrito()">
-    &#x1F6D2; Carrito <span id="carrito-count">0</span>
-  </button>
+  <div class="header-btns">
+    <button class="vip-btn" id="vip-btn" onclick="abrirVIP()">&#x2B50; VIP</button>
+    <a class="juego-btn" href="juego.html">&#x1F3AE; Jugar</a>
+    <button class="carrito-btn" onclick="abrirCarrito()">&#x1F6D2; Carrito <span id="carrito-count">0</span></button>
+  </div>
 </header>
 
 <section class="hero">
@@ -232,13 +251,27 @@
   </div>
 </div>
 
+<!-- PANEL VIP -->
+<div class="overlay-vip" id="overlay-vip">
+  <div class="vip-panel">
+    <div class="vip-badge">&#x2B50;</div>
+    <h3>Zona VIP</h3>
+    <p id="vip-panel-desc">Ingres&#225; tu DNI para acceder a tus beneficios exclusivos.</p>
+    <div id="vip-activo-info" style="display:none" class="vip-activo-info">
+      <div class="vip-activo-nombre" id="vip-activo-nombre"></div>
+      <div class="vip-activo-desc">&#x2B50; Cliente VIP &mdash; 5% de descuento aplicado</div>
+    </div>
+    <input class="dni-input" id="vip-dni-input" type="number" placeholder="Ej: 12345678" maxlength="8" style="display:block"/>
+    <div class="dni-error" id="vip-error"></div>
+    <button class="dni-btn" id="vip-confirmar-btn" onclick="verificarVIP()">&#x2B50; Ingresar como VIP</button>
+    <button class="dni-btn-cancelar" onclick="cerrarVIP()">Cerrar</button>
+  </div>
+</div>
+
 <footer>
   <strong>ZG Almac&#233;n</strong> &#x2014; Tu almac&#233;n de confianza &#x1F33F;<br/>
   <small>Hac&#233; tu pedido y te contactamos a la brevedad.</small>
 </footer>
-
-<a href="juego.html" style="position:fixed;bottom:1.5rem;right:1.5rem;background:linear-gradient(135deg,#2d6a4f,#52b788);color:white;text-decoration:none;border-radius:50px;padding:0.8rem 1.4rem;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.95rem;box-shadow:0 4px 20px rgba(82,183,136,0.5);z-index:999;display:flex;align-items:center;gap:8px;animation:bounce 2s ease-in-out infinite;">&#x1F3AE; &#xA1;Jug&#225; y gan&#225;!</a>
-<style>@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}</style>
 
 <script>
   const WHATSAPP_NUMBER = "541133869762";
@@ -248,7 +281,7 @@
 
   // URL de tu planilla de CLIENTES (Google Sheets publicado como CSV - solo lectura, sin datos sensibles de contacto)
   // IMPORTANTE: Publicá esta planilla también como CSV desde Archivo > Compartir > Publicar en la web
-  const CLIENTES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRyzIRGg-tlls7PB8SsnIIIJQ4OQCRfdIs7qazlOBjqPcnPep6RR6UPI7rpceCZ_iGuLsOw3wDFwLrS/pub?gid=0&single=true&output=csv";
+  const CLIENTES_URL = "https://script.google.com/macros/s/AKfycbx9eJv7EGqZRLxG-MvQk86pz-7Q26xhCuSl2l7poNpgAa-OWq43Q3uFUdK0_qIROoKf/exec";
 
   // CONFIGURACIÓN DE DESCUENTOS POR VOLUMEN
   const DESC_VOLUMEN_3 = 2;   // 2% comprando 3+ unidades del mismo producto
@@ -291,18 +324,14 @@
   async function cargarClientes() {
     try {
       const res = await fetch(CLIENTES_URL);
-      const text = await res.text();
-      const lineas = text.trim().split('\n').slice(1);
-      clientes = lineas.filter(l => l.trim()).map(linea => {
-        const partes = parsearCSV(linea);
-        return {
-          dni: (partes[0] || '').trim(),
-          nombre: (partes[1] || '').trim(),
-          telefono: (partes[2] || '').trim(),
-          gastoMensual: parseInt(partes[3]) || 0,
-          clienteFiel: (partes[4] || '').trim().toUpperCase() === 'SI'
-        };
-      });
+      const data = await res.json();
+      clientes = data.map(fila => ({
+        dni: (fila.dni || '').toString().trim(),
+        nombre: (fila.nombre || '').trim(),
+        telefono: (fila.telefono || '').trim(),
+        gastoMensual: parseInt(fila.gastoMensual) || 0,
+        clienteFiel: (fila.clienteFiel || '').toString().toUpperCase() === 'SI'
+      }));
     } catch (e) {
       console.warn('No se pudo cargar la planilla de clientes');
     }
@@ -653,6 +682,65 @@
   // ===== INIT =====
   cargarProductos();
   cargarClientes();
+
+  // ===== VIP =====
+  function abrirVIP() {
+    if (clienteActual && clienteActual.clienteFiel) {
+      document.getElementById('vip-activo-info').style.display = 'block';
+      document.getElementById('vip-activo-nombre').textContent = '👤 ' + clienteActual.nombre;
+      document.getElementById('vip-dni-input').style.display = 'none';
+      document.getElementById('vip-confirmar-btn').style.display = 'none';
+      document.getElementById('vip-panel-desc').style.display = 'none';
+      document.getElementById('vip-error').textContent = '';
+    } else {
+      document.getElementById('vip-activo-info').style.display = 'none';
+      document.getElementById('vip-dni-input').style.display = 'block';
+      document.getElementById('vip-confirmar-btn').style.display = 'block';
+      document.getElementById('vip-panel-desc').style.display = 'block';
+      document.getElementById('vip-dni-input').value = '';
+      document.getElementById('vip-error').textContent = '';
+    }
+    document.getElementById('overlay-vip').classList.add('open');
+  }
+
+  function cerrarVIP() {
+    document.getElementById('overlay-vip').classList.remove('open');
+  }
+
+  async function verificarVIP() {
+    const dni = document.getElementById('vip-dni-input').value.trim();
+    const errorEl = document.getElementById('vip-error');
+
+    if (!dni || dni.length < 7) {
+      errorEl.textContent = 'Ingres\u00E1 un DNI v\u00E1lido.';
+      return;
+    }
+
+    errorEl.textContent = 'Verificando...';
+    if (clientes.length === 0) await cargarClientes();
+
+    const cliente = clientes.find(c => c.dni === dni);
+    if (!cliente) {
+      errorEl.textContent = '❌ DNI no registrado.';
+      return;
+    }
+    if (!cliente.clienteFiel) {
+      errorEl.textContent = '❌ No tenés beneficios VIP todavía.';
+      return;
+    }
+
+    clienteActual = cliente;
+    document.getElementById('vip-btn').classList.add('activo');
+    document.getElementById('vip-btn').textContent = '⭐ ' + cliente.nombre;
+    cerrarVIP();
+    renderCarrito();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('vip-dni-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') verificarVIP();
+    });
+  });
 </script>
 </body>
 </html>
