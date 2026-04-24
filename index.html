@@ -725,12 +725,14 @@
     document.getElementById('overlay-confirm').classList.remove('open');
   }
 
+  let pedidoEnviando = false;
+
   // ===== WHATSAPP =====
   async function enviarWhatsApp() {
+    if (pedidoEnviando) return;
+    pedidoEnviando = true;
     const btnWsp = document.querySelector('.btn-wsp');
-    if (btnWsp.disabled) return;
-    btnWsp.disabled = true;
-    btnWsp.textContent = 'Enviando...';
+    if (btnWsp) { btnWsp.style.pointerEvents = 'none'; btnWsp.style.opacity = '0.6'; btnWsp.textContent = 'Enviando...'; }
     const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
     const totales = calcularTotales(clienteActual);
 
@@ -781,7 +783,7 @@
     msg += `\n*TOTAL: $${totales.total.toLocaleString('es-AR')}*`;
 
     window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
-    btnWsp.textContent = '✅ Pedido enviado';
+    if (btnWsp) { btnWsp.textContent = '✅ Pedido enviado'; }
   }
 
   // ===== INIT =====
