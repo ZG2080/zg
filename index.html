@@ -444,10 +444,13 @@
       const sub = p.precio * cant;
       subtotal += sub;
 
-      // Descuento volumen por item
+      // Descuento volumen por item (solo si no es VIP)
+      const esFielCarrito = clienteActual && clienteActual.clienteFiel;
       let descVolumen = 0;
-      if (cant >= 6) descVolumen = DESC_VOLUMEN_6;
-      else if (cant >= 3) descVolumen = DESC_VOLUMEN_3;
+      if (!esFielCarrito) {
+        if (cant >= 6) descVolumen = DESC_VOLUMEN_6;
+        else if (cant >= 3) descVolumen = DESC_VOLUMEN_3;
+      }
 
       const descInfo = descVolumen > 0 ? `<div class="carrito-item-descuento">&#x2193; ${descVolumen}% desc. por volumen</div>` : '';
       const ofertaInfo = p.oferta > 0 ? `<div class="carrito-item-descuento">&#x1F525; ${p.oferta}% oferta del d&#237;a</div>` : '';
@@ -472,7 +475,7 @@
       <div class="resumen-linea subtotal"><span>Subtotal</span><span>$${totales.subtotal.toLocaleString('es-AR')}</span></div>
       ${totales.descOferta > 0 ? `<div class="resumen-linea descuento"><span>&#x1F525; Oferta del d&#237;a</span><span>-$${totales.descOferta.toLocaleString('es-AR')}</span></div>` : ''}
       ${totales.descVolumen > 0 ? `<div class="resumen-linea descuento"><span>&#x2193; Desc. por volumen</span><span>-$${totales.descVolumen.toLocaleString('es-AR')}</span></div>` : ''}
-      ${totales.descFiel > 0 ? `<div class="resumen-linea fiel"><span>&#x2B50; Cliente fiel (5%)</span><span>-$${totales.descFiel.toLocaleString('es-AR')}</span></div>` : ''}
+      ${totales.descFiel > 0 ? `<div class="resumen-linea fiel"><span>&#x2B50; Cliente VIP (5%)</span><span>-$${totales.descFiel.toLocaleString('es-AR')}</span></div>` : ''}
       <div class="resumen-linea total"><span>Total</span><span>$${totales.total.toLocaleString('es-AR')}</span></div>
     `;
   }
@@ -504,13 +507,14 @@
         descOferta += Math.round(precioBase * p.oferta / 100);
       }
 
-      // Descuento por volumen (NO acumula con cliente fiel, reemplaza no suma)
+      // Descuento por volumen acumulado sobre precio post-oferta (NO aplica a clientes VIP)
       if (!esFiel) {
         let pct = 0;
         if (cant >= 6) pct = DESC_VOLUMEN_6;
         else if (cant >= 3) pct = DESC_VOLUMEN_3;
         if (pct > 0) {
-          descVolumen += Math.round(precioBase * pct / 100);
+          const precioPostOferta = precioBase - (p.oferta > 0 ? Math.round(precioBase * p.oferta / 100) : 0);
+          descVolumen += Math.round(precioPostOferta * pct / 100);
         }
       }
     });
@@ -632,7 +636,8 @@
         if (cant >= 6) pct = DESC_VOLUMEN_6;
         else if (cant >= 3) pct = DESC_VOLUMEN_3;
         if (pct > 0) {
-          const d = Math.round(precioBase * pct / 100);
+          const precioPostOferta = precioBase - (p.oferta > 0 ? Math.round(precioBase * p.oferta / 100) : 0);
+          const d = Math.round(precioPostOferta * pct / 100);
           descuento += d;
           descInfo += `<div class="confirm-item-desc-oferta">&#x2193; Vol. ${pct}%: -$${d.toLocaleString('es-AR')}</div>`;
         }
