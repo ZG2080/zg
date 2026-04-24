@@ -727,6 +727,10 @@
 
   // ===== WHATSAPP =====
   async function enviarWhatsApp() {
+    const btnWsp = document.querySelector('.btn-wsp');
+    if (btnWsp.disabled) return;
+    btnWsp.disabled = true;
+    btnWsp.textContent = 'Enviando...';
     const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
     const totales = calcularTotales(clienteActual);
 
@@ -777,6 +781,7 @@
     msg += `\n*TOTAL: $${totales.total.toLocaleString('es-AR')}*`;
 
     window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
+    btnWsp.textContent = '✅ Pedido enviado';
   }
 
   // ===== INIT =====
