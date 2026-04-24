@@ -238,6 +238,18 @@
   </div>
 </div>
 
+<!-- DNI PEDIDO -->
+<div class="overlay-dni" id="overlay-dni-pedido">
+  <div class="dni-panel">
+    <h3>&#x1F464; Identificate</h3>
+    <p>Ingres&#225; tu DNI para registrar tu pedido.</p>
+    <input class="dni-input" id="dni-pedido-input" type="number" placeholder="Ej: 12345678"/>
+    <div class="dni-error" id="dni-pedido-error"></div>
+    <button class="dni-btn" onclick="confirmarDNIPedido()">Continuar</button>
+    <button class="dni-btn-cancelar" onclick="cerrarDNIPedido()">Cancelar</button>
+  </div>
+</div>
+
 <!-- PANEL VIP -->
 <div class="overlay-vip" id="overlay-vip">
   <div class="vip-panel">
@@ -269,6 +281,7 @@
   // URL de tu planilla de CLIENTES (Google Sheets publicado como CSV - solo lectura, sin datos sensibles de contacto)
   // IMPORTANTE: Publicá esta planilla también como CSV desde Archivo > Compartir > Publicar en la web
   const CLIENTES_URL = "https://zg-clientes.flz2080flz2080.workers.dev";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQXZ99pkxw0Bg_40V3XGROsPUTHkIcNKtnD7-19OdLErOSq229_IlDPmlq7mNmv0kn/exec";
 
   // CONFIGURACIÓN DE DESCUENTOS POR VOLUMEN
   const DESC_VOLUMEN_3 = 2;   // 2% comprando 3+ unidades del mismo producto
@@ -535,7 +548,47 @@
     const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
     if (ids.length === 0) { alert("Tu carrito est\u00E1 vac\u00EDo."); return; }
     cerrarCarrito();
-    // Si es VIP ya está identificado, sino va directo sin cliente
+    // Si ya está identificado (VIP), ir directo a confirmación
+    if (clienteActual) {
+      mostrarConfirmacion(clienteActual);
+    } else {
+      abrirDNIPedido();
+    }
+  }
+
+  // Panel DNI para identificar al cliente antes del pedido
+  function abrirDNIPedido() {
+    document.getElementById('dni-pedido-input').value = '';
+    document.getElementById('dni-pedido-error').textContent = '';
+    document.getElementById('overlay-dni-pedido').classList.add('open');
+    setTimeout(() => document.getElementById('dni-pedido-input').focus(), 100);
+  }
+
+  function cerrarDNIPedido() {
+    document.getElementById('overlay-dni-pedido').classList.remove('open');
+  }
+
+  async function confirmarDNIPedido() {
+    const dni = document.getElementById('dni-pedido-input').value.trim();
+    const errorEl = document.getElementById('dni-pedido-error');
+
+    if (!dni || dni.length < 7) {
+      errorEl.textContent = 'Ingres\u00E1 un DNI v\u00E1lido.';
+      return;
+    }
+
+    errorEl.textContent = 'Verificando...';
+    if (clientes.length === 0) await cargarClientes();
+
+    const cliente = clientes.find(c => c.dni === dni);
+    if (cliente) {
+      clienteActual = cliente;
+    } else {
+      // Cliente no registrado, lo guardamos solo con DNI
+      clienteActual = { dni, nombre: 'Sin nombre', clienteFiel: false };
+    }
+
+    cerrarDNIPedido();
     mostrarConfirmacion(clienteActual);
   }
 
@@ -594,6 +647,9 @@
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('vip-dni-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') verificarVIP();
+    });
+    document.getElementById('dni-pedido-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') confirmarDNIPedido();
     });
   });
 
@@ -670,13 +726,43 @@
   }
 
   // ===== WHATSAPP =====
-  function enviarWhatsApp() {
+  async function enviarWhatsApp() {
     const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
     const totales = calcularTotales(clienteActual);
 
+    // Armar descripción de productos para Sheets
+    const productosTexto = ids.map(id => {
+      const p = productos.find(x => x.id == id);
+      return `${p.nombre} x${carrito[id]}`;
+    }).join(', ');
+
+    // Anotar en Google Sheets
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dni: clienteActual ? clienteActual.dni : 'Sin DNI',
+          nombre: clienteActual ? clienteActual.nombre : 'Sin nombre',
+          productos: productosTexto,
+          subtotal: totales.subtotal,
+          descOferta: totales.descOferta,
+          descVolumen: totales.descVolumen,
+          descFiel: totales.descFiel,
+          total: totales.total
+        })
+      });
+    } catch(e) {
+      console.warn('No se pudo anotar el pedido:', e);
+    }
+
+    // Armar mensaje WhatsApp
     let msg = clienteActual && clienteActual.clienteFiel
-      ? `Hola ZG! Soy ${clienteActual.nombre} &#x2B50; VIP\nQuiero hacer el siguiente pedido:\n\n`
-      : `Hola ZG! Quiero hacer el siguiente pedido:\n\n`;
+      ? `Hola ZG! Soy ${clienteActual.nombre} \u2B50 VIP\nQuiero hacer el siguiente pedido:\n\n`
+      : clienteActual && clienteActual.nombre !== 'Sin nombre'
+        ? `Hola ZG! Soy ${clienteActual.nombre} (DNI: ${clienteActual.dni})\nQuiero hacer el siguiente pedido:\n\n`
+        : `Hola ZG! (DNI: ${clienteActual ? clienteActual.dni : 'Sin DNI'})\nQuiero hacer el siguiente pedido:\n\n`;
 
     ids.forEach(id => {
       const p = productos.find(x => x.id == id);
