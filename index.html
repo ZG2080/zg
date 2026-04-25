@@ -17,8 +17,10 @@
     header { background: var(--verde); color: var(--blanco); padding: 0 2rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px var(--sombra); display: flex; align-items: center; justify-content: space-between; height: 70px; }
     .logo { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
     .logo span { background: var(--verde-claro); color: var(--verde); border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-    nav a { color: var(--blanco); text-decoration: none; margin-left: 1.5rem; font-weight: 600; font-size: 0.95rem; opacity: 0.85; transition: opacity 0.2s; }
+    nav { display: flex; align-items: center; gap: 1.5rem; }
+    nav a { color: var(--blanco); text-decoration: none; font-weight: 600; font-size: 0.95rem; opacity: 0.85; transition: opacity 0.2s; }
     nav a:hover { opacity: 1; }
+    .dropdown { position: relative; display: flex; align-items: center; }
     .carrito-btn { background: var(--verde-claro); color: var(--verde); border: none; border-radius: 25px; padding: 0.4rem 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s, transform 0.1s; }
     .carrito-btn:hover { background: #74c69d; transform: scale(1.04); }
     .vip-btn { background: linear-gradient(135deg, #f4a261, #e76f51); color: white; border: none; border-radius: 25px; padding: 0.4rem 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: opacity 0.2s, transform 0.1s; white-space: nowrap; }
@@ -150,8 +152,7 @@
     .btn-pedido { margin-top: 1rem; width: 100%; background: #25d366; color: white; border: none; border-radius: 12px; padding: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
     .btn-pedido:hover { background: #1ebe5d; }
 
-    /* MENÚ DESPLEGABLE EMPRESA */
-    .dropdown { position: relative; }
+    .dropdown { position: relative; display: flex; align-items: center; }
     .dropdown-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 25px; padding: 0.4rem 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
     .dropdown-btn:hover { background: rgba(255,255,255,0.25); }
     .dropdown-menu { display: none; position: absolute; top: calc(100% + 8px); left: 0; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); overflow: hidden; min-width: 150px; z-index: 200; }
@@ -316,7 +317,7 @@
   // URL de tu planilla de CLIENTES (Google Sheets publicado como CSV - solo lectura, sin datos sensibles de contacto)
   // IMPORTANTE: Publicá esta planilla también como CSV desde Archivo > Compartir > Publicar en la web
   const CLIENTES_URL = "https://zg-clientes.flz2080flz2080.workers.dev";
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz959IF6fbNRW5jVkKAKPNCXwsOE9cdtPka7OgcKjI6WC9q4uldbcNH-O4ooL-VX3Td/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbys-4TTy-VSwxG5QNt_4rZIULd-AA3Z7XplyWBGcZtFtGPZLfkrd2XuJlXnbuJsvTnD/exec";
 
   // CONFIGURACIÓN DE DESCUENTOS POR VOLUMEN
   const DESC_VOLUMEN_3 = 2;   // 2% comprando 3+ unidades del mismo producto
