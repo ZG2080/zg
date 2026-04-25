@@ -185,7 +185,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz959IF6fbNRW5jVkKAKPNCXwsOE9cdtPka7OgcKjI6WC9q4uldbcNH-O4ooL-VX3Td/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbys-4TTy-VSwxG5QNt_4rZIULd-AA3Z7XplyWBGcZtFtGPZLfkrd2XuJlXnbuJsvTnD/exec";
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSv3S0-9lg6rTpkSbV5bdO-5jFbnC5agixFaFAG0pzR6cmruw8neU6tc7Vf-1Uufqj9JfDngA5YIusK/pub?gid=0&single=true&output=csv";
 
   const DESC_VOLUMEN_3 = 2;
@@ -239,20 +239,26 @@
     mostrarToast('Buscando...');
     try {
       const res = await fetch(SCRIPT_URL + '?accion=cliente&dni=' + encodeURIComponent(dni));
-      const data = await res.json();
+      const text = await res.text();
+      const data = JSON.parse(text);
+      const info = document.getElementById('cliente-info');
       if (data.encontrado) {
-        clienteActual = data;
-        const info = document.getElementById('cliente-info');
-        info.innerHTML = (data.clienteFiel ? '⭐ ' : '👤 ') + data.nombre + (data.clienteFiel ? ' — Cliente VIP' : '');
+        clienteActual = {
+          dni: data.dni.toString(),
+          nombre: data.nombre,
+          clienteFiel: data.clienteFiel === true || data.clienteFiel === 'true'
+        };
+        info.innerHTML = (clienteActual.clienteFiel ? '⭐ ' : '👤 ') + clienteActual.nombre + (clienteActual.clienteFiel ? ' — Cliente VIP' : '');
         info.classList.add('visible');
-        mostrarToast('Cliente encontrado');
+        mostrarToast(clienteActual.clienteFiel ? '⭐ Cliente VIP encontrado' : 'Cliente encontrado');
       } else {
         clienteActual = { dni, nombre: 'Sin nombre', clienteFiel: false };
-        const info = document.getElementById('cliente-info');
         info.innerHTML = '👤 DNI ' + dni + ' (no registrado)';
         info.classList.add('visible');
+        mostrarToast('DNI no registrado');
       }
     } catch(e) {
+      mostrarToast('Error al buscar cliente');
       clienteActual = { dni, nombre: 'Sin nombre', clienteFiel: false };
     }
     renderCarrito();
