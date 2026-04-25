@@ -317,7 +317,7 @@
   // URL de tu planilla de CLIENTES (Google Sheets publicado como CSV - solo lectura, sin datos sensibles de contacto)
   // IMPORTANTE: Publicá esta planilla también como CSV desde Archivo > Compartir > Publicar en la web
   const CLIENTES_URL = "https://zg-clientes.flz2080flz2080.workers.dev";
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxtYDn1Va-kGq7XIN_q2fQZNZ5vpamTQ_YTeZQZ4A_kI73NQf1gwGDhYi75AYLEcn99/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzgHJPPHMDLUH5GZPFOsbX4Ln6YZO_TDKO3Kd0qVa4EE_Pb8dHQ4lFRgFzgfX_1G1y9/exec";
 
   // CONFIGURACIÓN DE DESCUENTOS POR VOLUMEN
   const DESC_VOLUMEN_3 = 2;   // 2% comprando 3+ unidades del mismo producto
@@ -824,6 +824,7 @@
           dni: clienteActual ? clienteActual.dni : 'Sin DNI',
           nombre: clienteActual ? clienteActual.nombre : 'Sin nombre',
           productos: productosTexto,
+          items: ids.map(id => ({ nombre: productos.find(x => x.id == id).nombre, cantidad: carrito[id] })),
           subtotal: totales.subtotal,
           descOferta: totales.descOferta,
           descVolumen: totales.descVolumen,

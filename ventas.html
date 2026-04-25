@@ -185,7 +185,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxtYDn1Va-kGq7XIN_q2fQZNZ5vpamTQ_YTeZQZ4A_kI73NQf1gwGDhYi75AYLEcn99/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzgHJPPHMDLUH5GZPFOsbX4Ln6YZO_TDKO3Kd0qVa4EE_Pb8dHQ4lFRgFzgfX_1G1y9/exec";
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSv3S0-9lg6rTpkSbV5bdO-5jFbnC5agixFaFAG0pzR6cmruw8neU6tc7Vf-1Uufqj9JfDngA5YIusK/pub?gid=0&single=true&output=csv";
 
   const DESC_VOLUMEN_3 = 2;
@@ -503,6 +503,7 @@
           dni: clienteActual ? clienteActual.dni : '12345678',
           nombre: clienteActual ? clienteActual.nombre : 'Sin nombre',
           productos: productosTexto,
+          items: ids.map(id => ({ nombre: productos.find(x => x.id == id).nombre, cantidad: carrito[id] })),
           subtotal: t.subtotal,
           descOferta: t.descOferta,
           descVolumen: t.descVolumen,
