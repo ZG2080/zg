@@ -150,6 +150,22 @@
     .btn-pedido { margin-top: 1rem; width: 100%; background: #25d366; color: white; border: none; border-radius: 12px; padding: 0.8rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
     .btn-pedido:hover { background: #1ebe5d; }
 
+    /* MENÚ DESPLEGABLE EMPRESA */
+    .dropdown { position: relative; }
+    .dropdown-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 25px; padding: 0.4rem 1.1rem; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
+    .dropdown-btn:hover { background: rgba(255,255,255,0.25); }
+    .dropdown-menu { display: none; position: absolute; top: calc(100% + 8px); left: 0; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); overflow: hidden; min-width: 150px; z-index: 200; }
+    .dropdown-menu.open { display: block; }
+    .dropdown-item { display: block; padding: 0.7rem 1.1rem; color: var(--texto); text-decoration: none; font-weight: 600; font-size: 0.9rem; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-family: 'Nunito', sans-serif; transition: background 0.15s; }
+    .dropdown-item:hover { background: var(--verde-suave); color: var(--verde); }
+
+    /* OVERLAY CONTRASEÑA */
+    .overlay-pass { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 400; align-items: center; justify-content: center; padding: 1rem; }
+    .overlay-pass.open { display: flex; }
+    .pass-panel { background: var(--blanco); width: 100%; max-width: 380px; border-radius: 20px; padding: 2rem; animation: slideUp 0.3s ease; text-align: center; }
+    .pass-panel h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--verde); margin-bottom: 0.5rem; }
+    .pass-panel p { font-size: 0.88rem; color: #666; margin-bottom: 1.2rem; }
+
     footer { background: var(--verde); color: rgba(255,255,255,0.85); text-align: center; padding: 1.5rem; font-size: 0.88rem; margin-top: 2rem; }
     footer strong { color: white; }
     @media (max-width: 600px) { .productos-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; padding: 1rem; } nav { display: none; } }
@@ -161,7 +177,13 @@
   <div class="logo"><span>&#x1F6D2;</span> ZG</div>
   <nav>
     <a href="#">Inicio</a>
-    <a href="#">Productos</a>
+    <div class="dropdown" id="dropdown-empresa">
+      <button class="dropdown-btn" onclick="toggleDropdown()">&#x1F3E2; Empresa &#x25BE;</button>
+      <div class="dropdown-menu" id="dropdown-menu">
+        <button class="dropdown-item" onclick="abrirHistoria()">&#x1F4D6; Historia</button>
+        <button class="dropdown-item" onclick="abrirVentas()">&#x1F4B0; Ventas</button>
+      </div>
+    </div>
     <a href="https://wa.me/541133869762" target="_blank">Contacto</a>
   </nav>
   <div class="header-btns">
@@ -238,6 +260,19 @@
   </div>
 </div>
 
+<!-- OVERLAY CONTRASEÑA VENTAS -->
+<div class="overlay-pass" id="overlay-pass">
+  <div class="pass-panel">
+    <div style="font-size:2rem;margin-bottom:0.5rem">&#x1F512;</div>
+    <h3>Acceso Ventas</h3>
+    <p>Ingres&#225; la contrase&#241;a para continuar.</p>
+    <input class="dni-input" id="pass-input" type="password" placeholder="Contrase&#241;a"/>
+    <div class="dni-error" id="pass-error"></div>
+    <button class="dni-btn" onclick="verificarContrasena()">Ingresar</button>
+    <button class="dni-btn-cancelar" onclick="cerrarPass()">Cancelar</button>
+  </div>
+</div>
+
 <!-- DNI PEDIDO -->
 <div class="overlay-dni" id="overlay-dni-pedido">
   <div class="dni-panel">
@@ -281,7 +316,7 @@
   // URL de tu planilla de CLIENTES (Google Sheets publicado como CSV - solo lectura, sin datos sensibles de contacto)
   // IMPORTANTE: Publicá esta planilla también como CSV desde Archivo > Compartir > Publicar en la web
   const CLIENTES_URL = "https://zg-clientes.flz2080flz2080.workers.dev";
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQXZ99pkxw0Bg_40V3XGROsPUTHkIcNKtnD7-19OdLErOSq229_IlDPmlq7mNmv0kn/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz959IF6fbNRW5jVkKAKPNCXwsOE9cdtPka7OgcKjI6WC9q4uldbcNH-O4ooL-VX3Td/exec";
 
   // CONFIGURACIÓN DE DESCUENTOS POR VOLUMEN
   const DESC_VOLUMEN_3 = 2;   // 2% comprando 3+ unidades del mismo producto
@@ -290,10 +325,51 @@
   const MONTO_FIEL = 200000;  // Gasto mensual mínimo para ser cliente fiel
 
   let productos = [];
-  let clientes = [];
   let carrito = {};
   let categoriaActual = "todos";
   let clienteActual = null;
+
+  // ===== MENÚ EMPRESA =====
+  function toggleDropdown() {
+    document.getElementById('dropdown-menu').classList.toggle('open');
+  }
+  document.addEventListener('click', e => {
+    if (!document.getElementById('dropdown-empresa').contains(e.target)) {
+      document.getElementById('dropdown-menu').classList.remove('open');
+    }
+  });
+  function abrirHistoria() {
+    document.getElementById('dropdown-menu').classList.remove('open');
+    alert('Historia de ZG Almacén — próximamente.');
+  }
+  function abrirVentas() {
+    document.getElementById('dropdown-menu').classList.remove('open');
+    document.getElementById('pass-input').value = '';
+    document.getElementById('pass-error').textContent = '';
+    document.getElementById('overlay-pass').classList.add('open');
+    setTimeout(() => document.getElementById('pass-input').focus(), 100);
+  }
+  function cerrarPass() {
+    document.getElementById('overlay-pass').classList.remove('open');
+  }
+  async function verificarContrasena() {
+    const ingresada = document.getElementById('pass-input').value.trim();
+    const errorEl = document.getElementById('pass-error');
+    if (!ingresada) { errorEl.textContent = 'Ingres\u00E1 la contrase\u00F1a.'; return; }
+    errorEl.textContent = 'Verificando...';
+    try {
+      const res = await fetch(SCRIPT_URL + '?accion=verificarPass&pass=' + encodeURIComponent(ingresada));
+      const data = await res.json();
+      if (data.ok) {
+        cerrarPass();
+        window.location.href = 'ventas.html';
+      } else {
+        errorEl.textContent = '\u274C Contrase\u00F1a incorrecta.';
+      }
+    } catch(e) {
+      errorEl.textContent = 'Error al verificar. Intent\u00E1 de nuevo.';
+    }
+  }
 
   // ===== CARGAR DATOS =====
   async function cargarProductos() {
@@ -321,19 +397,14 @@
     }
   }
 
-  async function cargarClientes() {
+  async function buscarClientePorDNI(dni) {
     try {
-      const res = await fetch(CLIENTES_URL);
+      const res = await fetch(SCRIPT_URL + '?accion=cliente&dni=' + encodeURIComponent(dni));
       const data = await res.json();
-      clientes = data.map(fila => ({
-        dni: (fila.dni || '').toString().trim(),
-        nombre: (fila.nombre || '').trim(),
-        telefono: (fila.telefono || '').trim(),
-        gastoMensual: parseInt(fila.gastoMensual) || 0,
-        clienteFiel: (fila.clienteFiel || '').toString().toUpperCase() === 'SI'
-      }));
-    } catch (e) {
-      console.warn('No se pudo cargar la planilla de clientes');
+      if (data.encontrado) return data;
+      return null;
+    } catch(e) {
+      return null;
     }
   }
 
@@ -578,13 +649,11 @@
     }
 
     errorEl.textContent = 'Verificando...';
-    if (clientes.length === 0) await cargarClientes();
+    const cliente = await buscarClientePorDNI(dni);
 
-    const cliente = clientes.find(c => c.dni === dni);
     if (cliente) {
       clienteActual = cliente;
     } else {
-      // Cliente no registrado, lo guardamos solo con DNI
       clienteActual = { dni, nombre: 'Sin nombre', clienteFiel: false };
     }
 
@@ -625,9 +694,8 @@
     }
 
     errorEl.textContent = 'Verificando...';
-    if (clientes.length === 0) await cargarClientes();
+    const cliente = await buscarClientePorDNI(dni);
 
-    const cliente = clientes.find(c => c.dni === dni);
     if (!cliente) {
       errorEl.textContent = '\u274C DNI no registrado.';
       return;
@@ -650,6 +718,9 @@
     });
     document.getElementById('dni-pedido-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') confirmarDNIPedido();
+    });
+    document.getElementById('pass-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') verificarContrasena();
     });
   });
 
@@ -788,7 +859,6 @@
 
   // ===== INIT =====
   cargarProductos();
-  cargarClientes();
 </script>
 </body>
 </html>
