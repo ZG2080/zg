@@ -124,6 +124,7 @@
 
 <header>
   <div class="logo">&#x1F4B0; ZG Ventas</div>
+  <div id="vendedor-nombre" style="color:rgba(255,255,255,0.9);font-weight:700;font-size:0.95rem;"></div>
   <a class="back-btn" href="index.html">&#x2190; Volver</a>
 </header>
 
@@ -206,7 +207,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXZ7_3UVOf6ThuSsQRC7DMYMuQG5X0ZR5aZuSa4JEoS_TrLioaQBUNTLrSXX492i9S/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzqiIkI95vdhrzDXKBvelDrnPXNhHdgiD-BI04wQjqom-j-JCiIByFX9BiNNo7OC9pa/exec";
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSv3S0-9lg6rTpkSbV5bdO-5jFbnC5agixFaFAG0pzR6cmruw8neU6tc7Vf-1Uufqj9JfDngA5YIusK/pub?gid=0&single=true&output=csv";
 
   const DESC_VOLUMEN_3 = 2;
@@ -218,6 +219,13 @@
   let clienteActual = null;
   let medioPago = 'Efectivo';
   let ventaEnviando = false;
+
+  let vendedorActual = '';
+
+  // Leer vendedor de la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  vendedorActual = urlParams.get('vendedor') || 'Sin nombre';
+  document.getElementById('vendedor-nombre').textContent = '👤 ' + vendedorActual;
 
   // ===== CARGAR PRODUCTOS =====
   async function cargarProductos() {
@@ -530,7 +538,8 @@
           descVolumen: t.descVolumen,
           descFiel: t.descFiel,
           total: t.total,
-          medioPago
+          medioPago,
+          vendedor: vendedorActual
         })
       });
     } catch(e) {

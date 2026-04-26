@@ -317,7 +317,7 @@
   // URL de tu planilla de CLIENTES (Google Sheets publicado como CSV - solo lectura, sin datos sensibles de contacto)
   // IMPORTANTE: Publicá esta planilla también como CSV desde Archivo > Compartir > Publicar en la web
   const CLIENTES_URL = "https://zg-clientes.flz2080flz2080.workers.dev";
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXZ7_3UVOf6ThuSsQRC7DMYMuQG5X0ZR5aZuSa4JEoS_TrLioaQBUNTLrSXX492i9S/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzqiIkI95vdhrzDXKBvelDrnPXNhHdgiD-BI04wQjqom-j-JCiIByFX9BiNNo7OC9pa/exec";
 
   // CONFIGURACIÓN DE DESCUENTOS POR VOLUMEN
   const DESC_VOLUMEN_3 = 2;   // 2% comprando 3+ unidades del mismo producto
@@ -359,11 +359,11 @@
     if (!ingresada) { errorEl.textContent = 'Ingres\u00E1 la contrase\u00F1a.'; return; }
     errorEl.textContent = 'Verificando...';
     try {
-      const res = await fetch(SCRIPT_URL + '?accion=verificarPass&pass=' + encodeURIComponent(ingresada));
+      const res = await fetch(SCRIPT_URL + '?accion=login&pass=' + encodeURIComponent(ingresada));
       const data = await res.json();
       if (data.ok) {
         cerrarPass();
-        window.location.href = 'ventas.html';
+        window.location.href = 'ventas.html?vendedor=' + encodeURIComponent(data.nombre);
       } else {
         errorEl.textContent = '\u274C Contrase\u00F1a incorrecta.';
       }
