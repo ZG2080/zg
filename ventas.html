@@ -101,6 +101,19 @@
     .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--verde); color: white; padding: 0.8rem 1.5rem; border-radius: 25px; font-weight: 700; font-size: 0.95rem; z-index: 500; transition: transform 0.3s ease; white-space: nowrap; }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
+    /* ALERTAS VENCIMIENTO */
+    .alertas-panel { background: white; border-radius: 16px; padding: 1.2rem; box-shadow: 0 2px 12px var(--sombra); border-left: 4px solid var(--rojo); margin-bottom: 1rem; }
+    .alertas-titulo { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--rojo); margin-bottom: 0.8rem; font-weight: 700; }
+    .alerta-item { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid #f5f5f5; font-size: 0.88rem; }
+    .alerta-item:last-child { border-bottom: none; }
+    .alerta-nombre { font-weight: 700; color: var(--texto); }
+    .alerta-fecha { font-size: 0.8rem; color: #888; }
+    .alerta-dias { font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.78rem; }
+    .alerta-dias.vencido { background: #fde; color: var(--rojo); }
+    .alerta-dias.urgente { background: #fff3e0; color: #e65100; }
+    .alerta-dias.proximo { background: #fffde7; color: #f57f17; }
+    .alertas-vacio { font-size: 0.88rem; color: #aaa; text-align: center; padding: 0.5rem 0; }
+
     @media (max-width: 700px) {
       .layout { grid-template-columns: 1fr; }
       .panel-der { position: static; }
@@ -115,8 +128,14 @@
 </header>
 
 <div class="layout">
-  <!-- PANEL IZQUIERDO -->
-  <div class="panel-izq">
+<div style="padding: 1.2rem 1.2rem 0; max-width: 1200px; margin: 0 auto;">
+  <div id="alertas-vencimiento" style="display:none" class="alertas-panel">
+    <div class="alertas-titulo">⚠️ Productos por vencer</div>
+    <div id="alertas-lista"></div>
+  </div>
+</div>
+
+<div class="layout">
 
     <!-- DNI -->
     <div class="card">
@@ -536,6 +555,35 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
+  // ===== VENCIMIENTOS =====
+  async function cargarVencimientos() {
+    try {
+      const res = await fetch(SCRIPT_URL + '?accion=vencimientos');
+      const alertas = await res.json();
+      if (!Array.isArray(alertas) || alertas.length === 0) return;
+
+      const panel = document.getElementById('alertas-vencimiento');
+      const lista = document.getElementById('alertas-lista');
+      panel.style.display = 'block';
+
+      lista.innerHTML = alertas.map(a => {
+        let clase, texto;
+        if (a.diasRestantes <= 0) { clase = 'vencido'; texto = 'VENCIDO'; }
+        else if (a.diasRestantes <= 2) { clase = 'urgente'; texto = `${a.diasRestantes}d`; }
+        else { clase = 'proximo'; texto = `${a.diasRestantes}d`; }
+        return `<div class="alerta-item">
+          <div>
+            <div class="alerta-nombre">${a.nombre}</div>
+            <div class="alerta-fecha">Vence: ${a.fechaVenc}</div>
+          </div>
+          <span class="alerta-dias ${clase}">${texto}</span>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      console.warn('Error al cargar vencimientos:', e);
+    }
+  }
+
   // ===== INIT =====
   document.getElementById('dni-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') buscarCliente();
@@ -545,6 +593,7 @@
   document.getElementById('vuelto-wrap').classList.add('visible');
 
   cargarProductos();
+  cargarVencimientos();
 </script>
 </body>
 </html>
