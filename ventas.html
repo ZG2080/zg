@@ -207,7 +207,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzqiIkI95vdhrzDXKBvelDrnPXNhHdgiD-BI04wQjqom-j-JCiIByFX9BiNNo7OC9pa/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXVZV2SLt4YmZOD1dZJu3fdF0qmkKC-gQjeQIs_394p8dLFxlIL8zSWE5oM8KggyP1/exec";
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSv3S0-9lg6rTpkSbV5bdO-5jFbnC5agixFaFAG0pzR6cmruw8neU6tc7Vf-1Uufqj9JfDngA5YIusK/pub?gid=0&single=true&output=csv";
 
   const DESC_VOLUMEN_3 = 2;
@@ -275,7 +275,9 @@
         clienteActual = {
           dni: data.dni.toString(),
           nombre: data.nombre,
-          clienteFiel: data.clienteFiel === true || data.clienteFiel === 'true'
+          clienteFiel: data.clienteFiel === true || data.clienteFiel === 'true',
+          mail: data.mail || '',
+          telefono: data.telefono || ''
         };
         info.innerHTML = (clienteActual.clienteFiel ? '⭐ ' : '👤 ') + clienteActual.nombre + (clienteActual.clienteFiel ? ' — Cliente VIP' : '');
         info.classList.add('visible');
@@ -531,6 +533,7 @@
           tipo: 'venta',
           dni: clienteActual ? clienteActual.dni : '12345678',
           nombre: clienteActual ? clienteActual.nombre : 'Sin nombre',
+          mail: clienteActual ? (clienteActual.mail || '') : '',
           productos: productosTexto,
           items: ids.map(id => ({ nombre: productos.find(x => x.id == id).nombre, cantidad: carrito[id] })),
           subtotal: t.subtotal,
