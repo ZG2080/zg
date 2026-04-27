@@ -759,27 +759,8 @@
     });
   });
 
-  let ticketOpcion = 'wsp'; // por defecto
-
-  function seleccionarTicket(opcion) {
-    ticketOpcion = opcion;
-    document.querySelectorAll('.ticket-btn').forEach(b => b.classList.remove('activo'));
-    document.getElementById('ticket-' + opcion).classList.add('activo');
-    const emailWrap = document.getElementById('ticket-email-wrap');
-    emailWrap.classList.toggle('visible', opcion === 'mail');
-  }
-
-  // Seleccionar WhatsApp por defecto al abrir confirmación
-  const _mostrarConfirmacionOrig = mostrarConfirmacion;
-
   // ===== CONFIRMACIÓN =====
   function mostrarConfirmacion(cliente) {
-    // Resetear ticket
-    ticketOpcion = 'wsp';
-    document.querySelectorAll('.ticket-btn').forEach(b => b.classList.remove('activo'));
-    document.getElementById('ticket-wsp').classList.add('activo');
-    document.getElementById('ticket-email-wrap').classList.remove('visible');
-    document.getElementById('ticket-email').value = '';
     const ids = Object.keys(carrito).filter(id => carrito[id] > 0);
     const totales = calcularTotales(cliente);
 
