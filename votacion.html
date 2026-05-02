@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ZG Almacén — Votación</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --verde: #2d6a4f;
+    --verde-claro: #52b788;
+    --verde-suave: #b7e4c7;
+    --amarillo: #f4a261;
+    --amarillo-dark: #854F0B;
+    --amarillo-bg: #FAEEDA;
+    --blanco: #ffffff;
+    --gris: #f8f9fa;
+    --gris2: #e9ecef;
+    --texto: #1b1b1b;
+    --texto2: #555;
+    --texto3: #888;
+    --borde: #dee2e6;
+    --rojo: #e63946;
+    --moneda: #b5830a;
+    --moneda-bg: #fff8e6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--gris);
+    color: var(--texto);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--verde);
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    color: var(--blanco);
+    font-size: 1.3rem;
+  }
+  header span {
+    font-size: 0.8rem;
+    color: var(--verde-suave);
+    font-weight: 600;
+  }
+
+  /* CONTENEDOR */
+  .contenedor {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 1.2rem 1rem 3rem;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--blanco);
+    border-radius: 16px;
+    padding: 1.3rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  /* LOGIN */
+  #seccion-login { text-align: center; }
+  #seccion-login h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--verde);
+    font-size: 1.4rem;
+    margin-bottom: 0.3rem;
+  }
+  #seccion-login p {
+    font-size: 0.85rem;
+    color: var(--texto2);
+    margin-bottom: 1.2rem;
+  }
+  .dni-input {
+    width: 100%;
+    border: 2px solid var(--verde-suave);
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 0.8rem;
+  }
+  .dni-input:focus { border-color: var(--verde); }
+  .btn-primary {
+    width: 100%;
+    background: var(--verde);
+    color: var(--blanco);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: #1f4e38; }
+  .btn-primary:disabled { background: var(--gris2); color: var(--texto3); cursor: not-allowed; }
+  .error-msg {
+    color: var(--rojo);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: none;
+  }
+  .no-registrado {
+    background: #fff3f3;
+    border: 1px solid #fcc;
+    border-radius: 10px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: #c0392b;
+    margin-top: 0.8rem;
+    display: none;
+    text-align: left;
+    line-height: 1.5;
+  }
+
+  /* BIENVENIDA */
+  #seccion-main { display: none; }
+  .bienvenida {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .bienvenida-nombre {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--texto);
+  }
+  .bienvenida-tipo {
+    font-size: 0.8rem;
+    color: var(--texto3);
+    margin-top: 2px;
+  }
+  .monedas-badge {
+    background: var(--moneda-bg);
+    border: 1.5px solid #f0c040;
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+  .monedas-valor {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--moneda);
+    line-height: 1;
+  }
+  .monedas-label {
+    font-size: 0.7rem;
+    color: var(--amarillo-dark);
+    font-weight: 600;
+  }
+  .msg-motivador {
+    background: var(--gris);
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.85rem;
+    color: var(--texto2);
+    margin-top: 0.9rem;
+  }
+
+  /* ENCUESTA */
+  .encuesta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .encuesta-label {
+    font-size: 0.8rem;
+    color: var(--texto3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .badge-verde {
+    font-size: 0.75rem;
+    background: #d8f3dc;
+    color: #1b4332;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+  }
+  .encuesta-pregunta {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--texto);
+    margin: 0.6rem 0 1rem;
+    line-height: 1.4;
+  }
+
+  /* OPCIONES VOTACION */
+  .opciones { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .opcion-btn {
+    width: 100%;
+    background: var(--gris);
+    border: 2px solid var(--borde);
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--texto);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .opcion-btn:hover:not(:disabled) { border-color: var(--verde); background: #f0faf4; }
+  .opcion-btn:disabled { cursor: default; }
+
+  /* BARRAS RESULTADO */
+  .resultado-item { margin-bottom: 10px; }
+  .resultado-fila {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.88rem;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .resultado-fila span:last-child { color: var(--texto3); }
+  .barra-fondo {
+    height: 8px;
+    background: var(--gris2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .barra-fill {
+    height: 100%;
+    background: var(--verde-claro);
+    border-radius: 99px;
+    transition: width 0.6s ease;
+  }
+  .barra-fill.ganador { background: var(--verde); }
+  .encuesta-footer {
+    font-size: 0.78rem;
+    color: var(--texto3);
+    margin-top: 0.3rem;
+  }
+  .ya-voto-msg {
+    font-size: 0.82rem;
+    color: var(--verde);
+    font-weight: 700;
+  }
+
+  /* SIN ENCUESTA */
+  .sin-evento {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    color: var(--texto3);
+    font-size: 0.95rem;
+  }
+  .sin-evento span { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+
+  /* DIVISOR */
+  .divisor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 1.2rem 0;
+  }
+  .divisor-linea { flex: 1; height: 1px; background: var(--borde); }
+  .divisor-texto { font-size: 0.78rem; color: var(--texto3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+
+  /* SORTEO */
+  .sorteo-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.9rem;
+  }
+  .sorteo-premio-label { font-size: 0.78rem; color: var(--texto3); margin-bottom: 3px; }
+  .sorteo-premio { font-size: 1.2rem; font-weight: 800; color: var(--texto); }
+  .sorteo-fecha-label { font-size: 0.75rem; color: var(--texto3); text-align: right; }
+  .sorteo-fecha { font-size: 0.9rem; font-weight: 700; color: var(--texto); text-align: right; margin-top: 2px; }
+
+  .req-monedas {
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    margin-bottom: 0.9rem;
+    line-height: 1.5;
+  }
+  .req-monedas.ok { background: #d8f3dc; color: #1b4332; }
+  .req-monedas.falta { background: var(--amarillo-bg); color: var(--amarillo-dark); }
+  .req-monedas.vip { background: #fff3cd; color: #856404; }
+
+  .sorteo-desc {
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    background: var(--gris);
+    margin-bottom: 1rem;
+  }
+  .sorteo-desc-titulo {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--texto3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .sorteo-desc-texto {
+    font-size: 0.88rem;
+    color: var(--texto);
+    line-height: 1.6;
+  }
+
+  .participantes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.7rem;
+  }
+  .participantes-label { font-size: 0.88rem; color: var(--texto2); }
+  .participantes-label strong { color: var(--texto); }
+  .btn-ver-todos {
+    font-size: 0.8rem;
+    color: var(--texto3);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    font-size: 0.82rem;
+    background: var(--gris);
+    border: 1px solid var(--borde);
+    padding: 4px 10px;
+    border-radius: 20px;
+    color: var(--texto);
+    font-weight: 600;
+  }
+  .chip.vip { border-color: #f0c040; background: var(--moneda-bg); color: var(--moneda); }
+
+  .lista-extra {
+    display: none;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--borde);
+  }
+  .nota-vip {
+    font-size: 0.75rem;
+    color: var(--texto3);
+    margin-top: 0.8rem;
+    font-style: italic;
+  }
+
+  /* TYC */
+  .tyc-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.82rem;
+    color: var(--texto3);
+  }
+  .tyc-link a {
+    color: var(--verde);
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  /* LOADING */
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--texto3);
+    font-size: 0.9rem;
+  }
+  .spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--verde-suave);
+    border-top-color: var(--verde);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 0.7rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOAST */
+  #toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1b4332;
+    color: white;
+    padding: 0.7rem 1.4rem;
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    transition: transform 0.3s;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ZG Almacén</h1>
+  <span>🗳️ Votación & Sorteos</span>
+</header>
+
+<div class="contenedor">
+
+  <!-- LOGIN -->
+  <div id="seccion-login">
+    <div class="card">
+      <h2>Participá</h2>
+      <p>Ingresá tu DNI para acceder a las encuestas y sorteos.</p>
+      <input class="dni-input" id="dni-input" type="number" placeholder="Ej: 12345678" onkeydown="if(event.key==='Enter') ingresar()"/>
+      <button class="btn-primary" id="btn-ingresar" onclick="ingresar()">Ingresar</button>
+      <div class="error-msg" id="error-msg"></div>
+      <div class="no-registrado" id="no-registrado">
+        ❌ Tu DNI no está registrado.<br><br>
+        Para participar en encuestas y sorteos, registrate en el local o llamanos al <strong>📞 (número del almacén)</strong>.
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="seccion-main">
+
+    <!-- Bienvenida -->
+    <div class="card" id="card-bienvenida">
+      <div class="bienvenida">
+        <div>
+          <div class="bienvenida-nombre" id="bienvenida-nombre"></div>
+          <div class="bienvenida-tipo" id="bienvenida-tipo"></div>
+        </div>
+        <div class="monedas-badge">
+          <div class="monedas-valor" id="monedas-valor">0</div>
+          <div class="monedas-label">monedas ZG</div>
+        </div>
+      </div>
+      <div class="msg-motivador" id="msg-motivador"></div>
+    </div>
+
+    <!-- Encuesta -->
+    <div id="seccion-encuesta">
+      <div class="loading" id="loading-encuesta">
+        <div class="spinner"></div>
+        Cargando encuesta...
+      </div>
+      <div class="card" id="card-encuesta" style="display:none">
+        <div class="encuesta-header">
+          <span class="encuesta-label">Encuesta activa</span>
+          <span class="badge-verde" id="encuesta-cierre"></span>
+        </div>
+        <div class="encuesta-pregunta" id="encuesta-pregunta"></div>
+        <div class="opciones" id="opciones-container"></div>
+        <div class="encuesta-footer" id="encuesta-footer"></div>
+      </div>
+      <div class="card sin-evento" id="sin-encuesta" style="display:none">
+        <span>📋</span>
+        No hay ninguna encuesta activa por el momento.
+      </div>
+    </div>
+
+    <!-- Sorteo -->
+    <div id="seccion-sorteo" style="display:none">
+      <div class="divisor">
+        <div class="divisor-linea"></div>
+        <div class="divisor-texto">Sorteo activo</div>
+        <div class="divisor-linea"></div>
+      </div>
+      <div class="card">
+        <div class="sorteo-top">
+          <div>
+            <div class="sorteo-premio-label">Premio</div>
+            <div class="sorteo-premio" id="sorteo-premio"></div>
+          </div>
+          <div>
+            <div class="sorteo-fecha-label">Fecha del evento</div>
+            <div class="sorteo-fecha" id="sorteo-fecha"></div>
+          </div>
+        </div>
+
+        <div class="req-monedas" id="req-monedas"></div>
+
+        <div class="sorteo-desc">
+          <div class="sorteo-desc-titulo">Sobre este sorteo</div>
+          <div class="sorteo-desc-texto" id="sorteo-desc"></div>
+        </div>
+
+        <div class="participantes-header">
+          <div class="participantes-label">Participantes: <strong id="participantes-total">0</strong></div>
+          <button class="btn-ver-todos" id="btn-ver-todos" onclick="toggleLista()" style="display:none">Ver todos</button>
+        </div>
+
+        <div class="chips" id="chips-visibles"></div>
+        <div class="lista-extra" id="lista-extra"></div>
+        <div class="nota-vip">⭐ Los clientes VIP participan automáticamente.</div>
+      </div>
+    </div>
+
+    <!-- TYC -->
+    <div class="tyc-link">
+      <a href="tyc.html" target="_blank">📄 Términos y condiciones del sorteo</a>
+    </div>
+
+  </div><!-- fin seccion-main -->
+</div><!-- fin contenedor -->
+
+<div id="toast"></div>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXVZV2SLt4YmZOD1dZJu3fdF0qmkKC-gQjeQIs_394p8dLFxlIL8zSWE5oM8KggyP1/exec';
+  const MONEDAS_POR_ENCUESTA = 10;
+
+  let clienteActual = null;
+  let encuestaActual = null;
+  let sorteoActual = null;
+  let listaExpandida = false;
+
+  // ===== LOGIN =====
+  async function ingresar() {
+    const dni = document.getElementById('dni-input').value.trim();
+    if (!dni) return;
+
+    const btn = document.getElementById('btn-ingresar');
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+    document.getElementById('error-msg').style.display = 'none';
+    document.getElementById('no-registrado').style.display = 'none';
+
+    try {
+      const r = await fetch(`${SCRIPT_URL}?accion=cliente&dni=${dni}`);
+      const data = await r.json();
+
+      if (!data.encontrado) {
+        document.getElementById('no-registrado').style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Ingresar';
+        return;
+      }
+
+      clienteActual = data;
+      mostrarMain();
+
+    } catch(e) {
+      document.getElementById('error-msg').textContent = 'Error de conexión. Intentá de nuevo.';
+      document.getElementById('error-msg').style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Ingresar';
+    }
+  }
+
+  // ===== MOSTRAR MAIN =====
+  async function mostrarMain() {
+    document.getElementById('seccion-login').style.display = 'none';
+    document.getElementById('seccion-main').style.display = 'block';
+
+    // Bienvenida
+    document.getElementById('bienvenida-nombre').textContent = 'Hola, ' + clienteActual.nombre;
+    document.getElementById('bienvenida-tipo').textContent = clienteActual.clienteFiel ? '⭐ Cliente VIP' : '👤 Cliente registrado';
+    document.getElementById('monedas-valor').textContent = clienteActual.monedasZg || 0;
+
+    const monedas = clienteActual.monedasZg || 0;
+    document.getElementById('msg-motivador').textContent = monedas === 0
+      ? '¡Comenzá a votar en encuestas para ganar monedas ZG y participar en el próximo sorteo!'
+      : `Tenés ${monedas} monedas ZG. ¡Seguí votando para acumular más y participar en el próximo sorteo!`;
+
+    // Cargar encuesta y sorteo
+    await cargarDatos();
+  }
+
+  // ===== CARGAR DATOS =====
+  async function cargarDatos() {
+    try {
+      const r = await fetch(`${SCRIPT_URL}?accion=votacion&dni=${clienteActual.dni}`);
+      const data = await r.json();
+
+      document.getElementById('loading-encuesta').style.display = 'none';
+
+      // Encuesta
+      if (data.encuesta) {
+        encuestaActual = data.encuesta;
+        mostrarEncuesta(data.encuesta, data.yaVoto);
+      } else {
+        document.getElementById('sin-encuesta').style.display = 'block';
+      }
+
+      // Sorteo
+      if (data.sorteo) {
+        sorteoActual = data.sorteo;
+        mostrarSorteo(data.sorteo, data.participantes || []);
+      }
+
+    } catch(e) {
+      document.getElementById('loading-encuesta').style.display = 'none';
+      document.getElementById('sin-encuesta').style.display = 'block';
+    }
+  }
+
+  // ===== MOSTRAR ENCUESTA =====
+  function mostrarEncuesta(enc, yaVoto) {
+    const card = document.getElementById('card-encuesta');
+    card.style.display = 'block';
+
+    document.getElementById('encuesta-pregunta').textContent = enc.pregunta;
+    document.getElementById('encuesta-cierre').textContent = 'cierra ' + formatFecha(enc.fechaCierre);
+
+    const opciones = [enc.opcion1, enc.opcion2, enc.opcion3, enc.opcion4].filter(Boolean);
+    const votos = [enc.votos1||0, enc.votos2||0, enc.votos3||0, enc.votos4||0].slice(0, opciones.length);
+    const totalVotos = votos.reduce((a,b) => a+b, 0);
+
+    const cont = document.getElementById('opciones-container');
+    cont.innerHTML = '';
+
+    if (yaVoto) {
+      // Mostrar resultados
+      const maxVotos = Math.max(...votos);
+      opciones.forEach((op, i) => {
+        const pct = totalVotos > 0 ? Math.round(votos[i]/totalVotos*100) : 0;
+        const esGanador = votos[i] === maxVotos && maxVotos > 0;
+        cont.innerHTML += `
+          <div class="resultado-item">
+            <div class="resultado-fila">
+              <span>${op}</span>
+              <span>${pct}%</span>
+            </div>
+            <div class="barra-fondo">
+              <div class="barra-fill ${esGanador ? 'ganador' : ''}" style="width:${pct}%"></div>
+            </div>
+          </div>`;
+      });
+      document.getElementById('encuesta-footer').innerHTML =
+        `${totalVotos} votos totales · <span class="ya-voto-msg">✅ Ya votaste · +${MONEDAS_POR_ENCUESTA} ZG acreditadas</span>`;
+    } else {
+      // Mostrar botones para votar
+      opciones.forEach((op, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opcion-btn';
+        btn.textContent = op;
+        btn.onclick = () => votar(i+1, op);
+        cont.appendChild(btn);
+      });
+      document.getElementById('encuesta-footer').textContent = `${totalVotos} votos totales`;
+    }
+  }
+
+  // ===== VOTAR =====
+  async function votar(opcion, textoOpcion) {
+    const btns = document.querySelectorAll('.opcion-btn');
+    btns.forEach(b => b.disabled = true);
+
+    try {
+      const r = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          tipo: 'voto',
+          dni: clienteActual.dni,
+          nombre: clienteActual.nombre,
+          idEncuesta: encuestaActual.id,
+          opcion: opcion,
+          textoOpcion: textoOpcion
+        })
+      });
+      const data = await r.json();
+
+      if (data.ok) {
+        // Actualizar monedas localmente
+        clienteActual.monedasZg = (clienteActual.monedasZg || 0) + MONEDAS_POR_ENCUESTA;
+        document.getElementById('monedas-valor').textContent = clienteActual.monedasZg;
+        document.getElementById('msg-motivador').textContent =
+          `Tenés ${clienteActual.monedasZg} monedas ZG. ¡Seguí votando para acumular más y participar en el próximo sorteo!`;
+
+        mostrarToast('✅ ¡Voto registrado! +' + MONEDAS_POR_ENCUESTA + ' monedas ZG');
+
+        // Recargar datos para ver resultados
+        await cargarDatos();
+
+        // Actualizar mensaje de sorteo
+        if (sorteoActual) mostrarSorteo(sorteoActual, window._participantes || []);
+      }
+    } catch(e) {
+      btns.forEach(b => b.disabled = false);
+      mostrarToast('Error al registrar el voto. Intentá de nuevo.');
+    }
+  }
+
+  // ===== MOSTRAR SORTEO =====
+  function mostrarSorteo(sorteo, participantes) {
+    window._participantes = participantes;
+    document.getElementById('seccion-sorteo').style.display = 'block';
+    document.getElementById('sorteo-premio').textContent = sorteo.premio;
+    document.getElementById('sorteo-fecha').textContent = formatFecha(sorteo.fechaEvento);
+    document.getElementById('sorteo-desc').textContent = sorteo.descripcion;
+    document.getElementById('participantes-total').textContent = participantes.length;
+
+    // Requisito monedas
+    const reqEl = document.getElementById('req-monedas');
+    const monedas = clienteActual.monedasZg || 0;
+    const requeridas = parseInt(sorteo.monedasRequeridas) || 0;
+
+    if (clienteActual.clienteFiel) {
+      reqEl.className = 'req-monedas vip';
+      reqEl.textContent = '⭐ Sos cliente VIP, participás automáticamente en el sorteo.';
+    } else if (monedas >= requeridas) {
+      reqEl.className = 'req-monedas ok';
+      reqEl.textContent = `✅ Tenés ${monedas} monedas ZG. ¡Ya podés participar en el sorteo!`;
+    } else {
+      const faltan = requeridas - monedas;
+      reqEl.className = 'req-monedas falta';
+      reqEl.textContent = `Para participar necesitás ${requeridas} monedas ZG. Te faltan ${faltan}. ¡Seguí votando!`;
+    }
+
+    // Participantes
+    const visibles = document.getElementById('chips-visibles');
+    const extra = document.getElementById('lista-extra');
+    const btnVer = document.getElementById('btn-ver-todos');
+
+    visibles.innerHTML = '';
+    extra.innerHTML = '';
+
+    const primeros = participantes.slice(0, 5);
+    const resto = participantes.slice(5);
+
+    primeros.forEach(p => {
+      visibles.innerHTML += `<span class="chip ${p.esVip ? 'vip' : ''}">${p.nombre}</span>`;
+    });
+
+    if (resto.length > 0) {
+      btnVer.style.display = 'block';
+      btnVer.textContent = `Ver todos (${participantes.length})`;
+      resto.forEach(p => {
+        extra.innerHTML += `<span class="chip ${p.esVip ? 'vip' : ''}">${p.nombre}</span>`;
+      });
+    }
+  }
+
+  // ===== TOGGLE LISTA =====
+  function toggleLista() {
+    listaExpandida = !listaExpandida;
+    const lista = document.getElementById('lista-extra');
+    const btn = document.getElementById('btn-ver-todos');
+    lista.style.display = listaExpandida ? 'flex' : 'none';
+    btn.textContent = listaExpandida ? 'Ver menos' : `Ver todos (${window._participantes.length})`;
+  }
+
+  // ===== HELPERS =====
+  function formatFecha(f) {
+    if (!f) return '';
+    const d = new Date(f);
+    if (isNaN(d)) return f;
+    return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  function mostrarToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Enter en DNI
+  document.getElementById('dni-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') ingresar();
+  });
+</script>
+</body>
+</html>
