@@ -298,6 +298,22 @@
   .req-monedas.ok { background: #d8f3dc; color: #1b4332; }
   .req-monedas.falta { background: var(--amarillo-bg); color: var(--amarillo-dark); }
   .req-monedas.vip { background: #fff3cd; color: #856404; }
+  .btn-participar {
+    width: 100%;
+    background: var(--verde);
+    color: var(--blanco);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background 0.2s;
+  }
+  .btn-participar:hover { background: #1f4e38; }
+  .btn-participar:disabled { background: var(--gris2); color: var(--texto3); cursor: not-allowed; }
 
   .sorteo-desc {
     border: 1px solid var(--borde);
@@ -418,6 +434,7 @@
 <body>
 
 <header>
+  <a href="index.html" style="color:var(--verde-suave);text-decoration:none;font-size:0.85rem;font-weight:700;">← Inicio</a>
   <h1>ZG Almacén</h1>
   <span>🗳️ Votación & Sorteos</span>
 </header>
@@ -498,6 +515,9 @@
         </div>
 
         <div class="req-monedas" id="req-monedas"></div>
+        <div id="btn-participar-container" style="display:none">
+          <button class="btn-participar" id="btn-participar" onclick="participarSorteo()">🎯 Participar en el sorteo</button>
+        </div>
 
         <div class="sorteo-desc">
           <div class="sorteo-desc-titulo">Sobre este sorteo</div>
@@ -718,13 +738,24 @@
     if (clienteActual.clienteFiel) {
       reqEl.className = 'req-monedas vip';
       reqEl.textContent = '⭐ Sos cliente VIP, participás automáticamente en el sorteo.';
+      document.getElementById('btn-participar-container').style.display = 'none';
     } else if (monedas >= requeridas) {
-      reqEl.className = 'req-monedas ok';
-      reqEl.textContent = `✅ Tenés ${monedas} monedas ZG. ¡Ya podés participar en el sorteo!`;
+      // Ver si ya está inscripto
+      const yaInscripto = participantes.some(p => p.dni === clienteActual.dni);
+      if (yaInscripto) {
+        reqEl.className = 'req-monedas ok';
+        reqEl.textContent = `✅ Ya estás inscripto en el sorteo. ¡Buena suerte!`;
+        document.getElementById('btn-participar-container').style.display = 'none';
+      } else {
+        reqEl.className = 'req-monedas ok';
+        reqEl.textContent = `✅ Tenés ${monedas} monedas ZG. ¡Podés participar en el sorteo!`;
+        document.getElementById('btn-participar-container').style.display = 'block';
+      }
     } else {
       const faltan = requeridas - monedas;
       reqEl.className = 'req-monedas falta';
       reqEl.textContent = `Para participar necesitás ${requeridas} monedas ZG. Te faltan ${faltan}. ¡Seguí votando!`;
+      document.getElementById('btn-participar-container').style.display = 'none';
     }
 
     // Participantes
@@ -748,6 +779,41 @@
       resto.forEach(p => {
         extra.innerHTML += `<span class="chip ${p.esVip ? 'vip' : ''}">${p.nombre}</span>`;
       });
+    }
+  }
+
+  // ===== PARTICIPAR SORTEO =====
+  async function participarSorteo() {
+    const btn = document.getElementById('btn-participar');
+    btn.disabled = true;
+    btn.textContent = 'Inscribiendo...';
+
+    try {
+      const r = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          tipo: 'participar',
+          dni: clienteActual.dni,
+          nombre: clienteActual.nombre,
+          monedasRequeridas: sorteoActual.monedasRequeridas
+        })
+      });
+      const data = await r.json();
+
+      if (data.ok) {
+        clienteActual.monedasZg = (clienteActual.monedasZg || 0) - sorteoActual.monedasRequeridas;
+        document.getElementById('monedas-valor').textContent = clienteActual.monedasZg;
+        mostrarToast('🎯 ¡Inscripto en el sorteo!');
+        await cargarDatos();
+      } else {
+        mostrarToast(data.error || 'Error al inscribirse.');
+        btn.disabled = false;
+        btn.textContent = '🎯 Participar en el sorteo';
+      }
+    } catch(e) {
+      mostrarToast('Error de conexión. Intentá de nuevo.');
+      btn.disabled = false;
+      btn.textContent = '🎯 Participar en el sorteo';
     }
   }
 
