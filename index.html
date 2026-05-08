@@ -891,6 +891,11 @@
   // ===== INIT =====
   cargarProductos();
 
+// Registrar service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+
 // PWA - Botón instalar
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
