@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ZG Almacén</title>
+  <link rel="manifest" href="manifest.json" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
   <style>
     :root {
@@ -214,6 +215,7 @@
     <button class="vip-btn" id="vip-btn-desktop" onclick="abrirVIP()">&#x2B50; VIP</button>
     <a class="juego-btn" href="votacion.html">&#x1F5F3;&#xFE0F; Votar</a>
     <a class="juego-btn" href="juego.html">&#x1F3AE; Jugar</a>
+    <button class="juego-btn" id="btn-instalar" style="display:none;" onclick="instalarApp()">&#x2B07;&#xFE0F; Instalar</button>
     <button class="carrito-btn" onclick="abrirCarrito()">&#x1F6D2; Carrito <span id="carrito-count-desktop">0</span></button>
   </div>
 </header>
@@ -888,6 +890,27 @@
 
   // ===== INIT =====
   cargarProductos();
+
+// PWA - Botón instalar
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('btn-instalar').style.display = 'flex';
+});
+
+function instalarApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('btn-instalar').style.display = 'none';
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('btn-instalar').style.display = 'none';
+});
 </script>
 </body>
 </html>
