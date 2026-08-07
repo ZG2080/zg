@@ -71,7 +71,6 @@
     .producto-card:hover { transform: translateY(-5px); box-shadow: 0 8px 24px var(--sombra); }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .oferta-badge { position: absolute; top: 8px; right: 8px; background: var(--rojo); color: white; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 10px; }
-    .producto-img { width: 100%; height: 140px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; background: var(--verde-suave); }
     .producto-info { padding: 0.9rem; }
     .producto-nombre { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.2rem; color: var(--texto); }
     .producto-desc { font-size: 0.78rem; color: #666; margin-bottom: 0.6rem; }
@@ -85,7 +84,6 @@
     .panel { background: var(--blanco); width: 100%; max-width: 520px; border-radius: 20px; padding: 1.5rem; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; position: relative; }
     @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .panel-cerrar { position: absolute; top: 1rem; right: 1rem; background: var(--verde-suave); border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 1.1rem; cursor: pointer; color: var(--verde); font-weight: 700; }
-    .panel-emoji { font-size: 4rem; text-align: center; margin-bottom: 0.5rem; }
     .panel-nombre { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--verde); text-align: center; margin-bottom: 0.3rem; }
     .panel-cat { text-align: center; font-size: 0.8rem; color: #888; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
     .panel-desc { font-size: 0.95rem; color: #555; text-align: center; margin-bottom: 1rem; line-height: 1.6; }
@@ -106,7 +104,6 @@
     .carrito-header h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--verde); }
     .cerrar-btn { background: var(--verde-suave); border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 1.1rem; cursor: pointer; color: var(--verde); font-weight: 700; }
     .carrito-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 0; border-bottom: 1px solid #eee; }
-    .carrito-item-emoji { font-size: 2rem; }
     .carrito-item-info { flex: 1; }
     .carrito-item-nombre { font-weight: 700; font-size: 0.9rem; }
     .carrito-item-precio { color: var(--verde); font-weight: 600; font-size: 0.85rem; }
@@ -242,7 +239,6 @@
 <div class="overlay" id="overlay-detalle" onclick="cerrarDetalleSiOverlay(event)">
   <div class="panel" id="panel-detalle">
     <button class="panel-cerrar" onclick="cerrarDetalle()">&#x2715;</button>
-    <div class="panel-emoji" id="panel-emoji"></div>
     <div class="panel-nombre" id="panel-nombre"></div>
     <div class="panel-cat" id="panel-cat"></div>
     <div class="panel-desc" id="panel-desc"></div>
@@ -457,7 +453,6 @@
     grid.innerHTML = lista.map((p, i) => `
       <div class="producto-card" style="animation-delay:${i*0.05}s" onclick="abrirDetalle(${p.id})">
         ${p.oferta > 0 ? `<div class="oferta-badge">&#x1F525; ${p.oferta}% OFF</div>` : ''}
-        <div class="producto-img">${p.emoji}</div>
         <div class="producto-info">
           <div class="producto-nombre">${p.nombre}</div>
           <div class="producto-desc">${p.desc}</div>
@@ -472,7 +467,6 @@
   function abrirDetalle(id) {
     const p = productos.find(x => x.id === id);
     if (!p) return;
-    document.getElementById('panel-emoji').textContent = p.emoji;
     document.getElementById('panel-nombre').textContent = p.nombre;
     document.getElementById('panel-cat').textContent = p.cat;
     document.getElementById('panel-desc').textContent = p.desc;
@@ -569,7 +563,6 @@
       const ofertaInfo = p.oferta > 0 ? `<div class="carrito-item-descuento">&#x1F525; ${p.oferta}% oferta del d&#237;a</div>` : '';
 
       return '<div class="carrito-item">' +
-        '<span class="carrito-item-emoji">' + p.emoji + '</span>' +
         '<div class="carrito-item-info">' +
           '<div class="carrito-item-nombre">' + p.nombre + '</div>' +
           '<div class="carrito-item-precio">$' + p.precio.toLocaleString('es-AR') + ' c/u &times; ' + cant + '</div>' +
@@ -803,7 +796,7 @@
       const precioFinal = precioBase - descuento;
       return `<div class="confirm-item">
         <div>
-          <div class="confirm-item-desc">${p.emoji} ${p.nombre} x${cant}</div>
+          <div class="confirm-item-desc">${p.nombre} x${cant}</div>
           ${descInfo}
         </div>
         <div class="confirm-item-precio">$${precioFinal.toLocaleString('es-AR')}</div>

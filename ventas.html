@@ -43,7 +43,6 @@
     .sugerencias.open { display: block; }
     .sugerencia-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 1rem; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
     .sugerencia-item:hover { background: var(--verde-suave); }
-    .sug-emoji { font-size: 1.6rem; }
     .sug-nombre { font-weight: 700; font-size: 0.9rem; }
     .sug-precio { font-size: 0.8rem; color: var(--verde); font-weight: 600; }
     .sug-oferta { font-size: 0.75rem; color: var(--rojo); font-weight: 600; }
@@ -65,7 +64,6 @@
     .panel-der { position: sticky; top: 1.2rem; height: fit-content; }
     .carrito-vacio { text-align: center; color: #aaa; padding: 2rem 0; font-size: 0.9rem; }
     .venta-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0; border-bottom: 1px solid #f0f0f0; }
-    .vi-emoji { font-size: 1.6rem; }
     .vi-info { flex: 1; }
     .vi-nombre { font-weight: 700; font-size: 0.88rem; }
     .vi-precio { font-size: 0.8rem; color: var(--verde); font-weight: 600; }
@@ -316,7 +314,6 @@
 
     sug.innerHTML = resultados.map(p => `
       <div class="sugerencia-item" onclick="agregarProducto(${p.id})">
-        <span class="sug-emoji">${p.emoji}</span>
         <div>
           <div class="sug-nombre">${p.nombre}</div>
           <div class="sug-precio">$${p.precio.toLocaleString('es-AR')}</div>
@@ -437,7 +434,6 @@
         if (pct > 0) descInfo += `<div class="vi-desc">↓ ${pct}% volumen</div>`;
       }
       return `<div class="venta-item">
-        <span class="vi-emoji">${p.emoji}</span>
         <div class="vi-info">
           <div class="vi-nombre">${p.nombre}</div>
           <div class="vi-precio">$${p.precio.toLocaleString('es-AR')} x${cant}</div>
@@ -488,7 +484,7 @@
     ids.forEach(id => {
       const p = productos.find(x => x.id == id);
       html += `<div class="confirm-item">
-        <span>${p.emoji} ${p.nombre} x${carrito[id]}</span>
+        <span>${p.nombre} x${carrito[id]}</span>
         <span>$${(p.precio * carrito[id]).toLocaleString('es-AR')}</span>
       </div>`;
     });
