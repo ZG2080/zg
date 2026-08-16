@@ -315,8 +315,8 @@
   <div class="subtitulo">SHOOTER</div>
   <div class="instrucciones">
     <p>
-      <strong>PC:</strong> WASD o flechas para mover · ESPACIO para disparar<br/>
-      <strong>Celular:</strong> Joystick + botón de disparo<br/><br/>
+      <strong>PC:</strong> WASD o flechas para mover · ESPACIO para disparar · E para bomba<br/>
+      <strong>Celular:</strong> Joystick + botón de disparo + botón de bomba<br/><br/>
       ⏱️ 20 minutos · 👾 Oleadas de enemigos · ☠️ Jefe al minuto 15<br/>
       🏆 El que más puntos haga gana el premio del día
     </p>
@@ -411,6 +411,9 @@ const keys = {};
 let joystickDir = { x: 0, y: 0 };
 let joystickActivo = false;
 let joystickOrigen = { x: 0, y: 0 };
+let mousePos = { x: 0, y: 0 };
+canvas.addEventListener('mousemove', e => { mousePos.x = e.clientX; mousePos.y = e.clientY; });
+canvas.addEventListener('click', () => disparar());
 
 // ===== RESIZE =====
 function resize() {
@@ -432,7 +435,7 @@ mostrarRankingEnPantalla('inicio-ranking');
 document.addEventListener('keydown', e => {
   keys[e.code] = true;
   if (e.code === 'Space') { e.preventDefault(); disparar(); }
-  if (e.code === 'KeyB') { e.preventDefault(); usarBomba(); }
+  if (e.code === 'KeyE') { e.preventDefault(); usarBomba(); }
 });
 document.addEventListener('keyup', e => keys[e.code] = false);
 
@@ -510,7 +513,7 @@ function resetJuego() {
     x: canvas.width / 2,
     y: canvas.height / 2,
     r: 14,
-    vel: 2.7,
+    vel: 2.727,
     ang: 0,
     cooldown: 0,
     bombas: 10
@@ -629,7 +632,7 @@ function disparar() {
     vy: Math.sin(ang) * 7.5,
     ang: ang,
     r: 5,
-    vida: 80
+    vida: 250
   });
 }
 
@@ -640,7 +643,7 @@ function usarBomba() {
   jugador.bombas--;
   actualizarHUD();
 
-  const RADIO_BOMBA = 80; // equivalente a 2x2 casilleros de la grilla visual (40px c/u)
+  const RADIO_BOMBA = 240; // triple del radio anterior (80 -> 240)
   const DAÑO_BOMBA = 2;
 
   crearExplosion(jugador.x, jugador.y, '#ffd700');
@@ -772,14 +775,14 @@ function moverJugador() {
     dx /= mag; dy /= mag;
     jugador.x += dx * jugador.vel;
     jugador.y += dy * jugador.vel;
-    jugador.ang = Math.atan2(dy, dx);
   }
 
-  // Puntero del mouse actualiza ángulo en PC
-  canvas.onmousemove = (e) => {
-    jugador.ang = Math.atan2(e.clientY - jugador.y, e.clientX - jugador.x);
-  };
-  canvas.onclick = () => disparar();
+  // Apuntar: en PC siempre sigue al mouse (incluso mientras te movés); en celular sigue la dirección del joystick
+  if (!isMobile) {
+    jugador.ang = Math.atan2(mousePos.y - jugador.y, mousePos.x - jugador.x);
+  } else if (mag > 0) {
+    jugador.ang = Math.atan2(dy, dx);
+  }
 
   // Límites del canvas
   jugador.x = Math.max(jugador.r, Math.min(canvas.width - jugador.r, jugador.x));
