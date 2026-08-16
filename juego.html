@@ -353,6 +353,7 @@
   <div class="hud-item"><span class="hud-label">PTS</span><span class="hud-val" id="hud-score">0</span></div>
   <div class="hud-item"><span class="hud-label">OLEADA</span><span class="hud-val" id="hud-oleada">1</span></div>
   <div class="hud-item vidas" id="hud-vidas">♥♥♥</div>
+  <div class="hud-item"><span class="hud-label">💣</span><span class="hud-val" id="hud-bombas">10</span></div>
   <div class="hud-item"><span class="hud-label">TIEMPO</span><span class="hud-val tiempo-val" id="hud-tiempo">20:00</span></div>
 </div>
 
@@ -368,7 +369,10 @@
 <!-- CONTROLES MÓVIL -->
 <div id="controles-movil">
   <div id="joystick-area"><div id="joystick-thumb"></div></div>
-  <button id="btn-disparar" ontouchstart="disparar()">🔫<br/>FUEGO</button>
+  <div style="display:flex; gap:0.6rem; pointer-events:all;">
+    <button id="btn-bomba" ontouchstart="usarBomba()" style="width:70px;height:70px;background:radial-gradient(circle, #ffe066, #ffb300);border:3px solid rgba(255,200,0,0.5);border-radius:50%;font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;color:#3a2a00;cursor:pointer;box-shadow:0 0 20px rgba(255,180,0,0.5);letter-spacing:1px;">💣<br/>BOMBA</button>
+    <button id="btn-disparar" ontouchstart="disparar()">🔫<br/>FUEGO</button>
+  </div>
 </div>
 
 <script>
@@ -398,7 +402,9 @@ let jugador = {};
 let balas = [];
 let enemigos = [];
 let particulas = [];
+let bombasPickup = [];
 let jefe = null;
+let oleadaUltimoDropBomba = 0;
 
 // Input
 const keys = {};
@@ -426,6 +432,7 @@ mostrarRankingEnPantalla('inicio-ranking');
 document.addEventListener('keydown', e => {
   keys[e.code] = true;
   if (e.code === 'Space') { e.preventDefault(); disparar(); }
+  if (e.code === 'KeyB') { e.preventDefault(); usarBomba(); }
 });
 document.addEventListener('keyup', e => keys[e.code] = false);
 
@@ -503,10 +510,14 @@ function resetJuego() {
     x: canvas.width / 2,
     y: canvas.height / 2,
     r: 14,
-    vel: 3.5,
+    vel: 2.7,
     ang: 0,
-    cooldown: 0
+    cooldown: 0,
+    bombas: 10
   };
+
+  bombasPickup = [];
+  oleadaUltimoDropBomba = 0;
 
   actualizarHUD();
   spawnOleada();
@@ -553,6 +564,8 @@ function actualizarHUD() {
   for (let i = 0; i < 3; i++) vidasStr += i < vidas ? '♥' : '♡';
   document.getElementById('hud-vidas').textContent = vidasStr;
 
+  document.getElementById('hud-bombas').textContent = jugador.bombas ?? 10;
+
   // Gas warning visual
   const gw = document.getElementById('gas-warning');
   gw.className = gasActivo ? 'activo' : '';
@@ -574,10 +587,13 @@ function spawnEnemigo() {
   else if (lado === 2) { x = Math.random() * canvas.width; y = canvas.height + 20; }
   else { x = -20; y = Math.random() * canvas.height; }
 
+  const velBase = 0.6 + oleada * 0.12 + Math.random() * 0.4;
+  const multiplicadorRonda = Math.pow(1.01, oleada - 1); // +1% acumulativo por ronda
+
   enemigos.push({
     x, y,
     r: 12,
-    vel: 0.8 + oleada * 0.15 + Math.random() * 0.5,
+    vel: velBase * multiplicadorRonda,
     hp: 1 + Math.floor(oleada / 3),
     maxHp: 1 + Math.floor(oleada / 3),
     tipo: 'normal'
@@ -589,7 +605,7 @@ function spawnJefe() {
     x: Math.random() > 0.5 ? 80 : canvas.width - 80,
     y: Math.random() > 0.5 ? 80 : canvas.height - 80,
     r: 40,
-    vel: 1.2,
+    vel: 0.95,
     hp: 80,
     maxHp: 80,
     tipo: 'jefe',
@@ -609,11 +625,90 @@ function disparar() {
   balas.push({
     x: jugador.x + Math.cos(ang) * (jugador.r + 6),
     y: jugador.y + Math.sin(ang) * (jugador.r + 6),
-    vx: Math.cos(ang) * 10,
-    vy: Math.sin(ang) * 10,
+    vx: Math.cos(ang) * 7.5,
+    vy: Math.sin(ang) * 7.5,
     ang: ang,
     r: 5,
     vida: 80
+  });
+}
+
+// ===== BOMBA =====
+function usarBomba() {
+  if (estado !== 'jugando') return;
+  if (jugador.bombas <= 0) return;
+  jugador.bombas--;
+  actualizarHUD();
+
+  const RADIO_BOMBA = 80; // equivalente a 2x2 casilleros de la grilla visual (40px c/u)
+  const DAÑO_BOMBA = 2;
+
+  crearExplosion(jugador.x, jugador.y, '#ffd700');
+  crearExplosion(jugador.x, jugador.y, '#ff9900');
+
+  enemigos = enemigos.filter(e => {
+    const dist = Math.sqrt((jugador.x - e.x) ** 2 + (jugador.y - e.y) ** 2);
+    if (dist < RADIO_BOMBA) {
+      e.hp -= DAÑO_BOMBA;
+      if (e.hp <= 0) {
+        crearExplosion(e.x, e.y, '#ff4444');
+        puntos += 10 * oleada;
+        intentarDropearBomba(e.x, e.y);
+        actualizarHUD();
+        return false;
+      }
+    }
+    return true;
+  });
+
+  if (jefe) {
+    const dist = Math.sqrt((jugador.x - jefe.x) ** 2 + (jugador.y - jefe.y) ** 2);
+    if (dist < RADIO_BOMBA) {
+      jefe.hp -= DAÑO_BOMBA;
+      crearExplosion(jefe.x, jefe.y, '#ff6600');
+      if (jefe.hp <= 0) {
+        crearExplosion(jefe.x, jefe.y, '#ffd700');
+        puntos += 500;
+        jefeMuerto = true;
+        jefe = null;
+        actualizarHUD();
+      }
+    }
+  }
+}
+
+// ===== PICKUPS DE BOMBA (drop al matar enemigos) =====
+function intentarDropearBomba(x, y) {
+  if (jugador.bombas >= 10) return; // tope de 10 bombas
+  if (oleada - oleadaUltimoDropBomba < 2) return; // máximo 1 cada 2 oleadas
+  if (Math.random() > 0.15) return; // chance de drop
+  oleadaUltimoDropBomba = oleada;
+  bombasPickup.push({ x, y, r: 10, vida: 600 });
+}
+
+function moverBombasPickup() {
+  bombasPickup = bombasPickup.filter(p => p.vida > 0);
+  bombasPickup.forEach(p => {
+    p.vida--;
+    const dist = Math.sqrt((jugador.x - p.x) ** 2 + (jugador.y - p.y) ** 2);
+    if (dist < jugador.r + p.r) {
+      p.vida = 0;
+      jugador.bombas = Math.min(10, jugador.bombas + 1);
+      actualizarHUD();
+    }
+  });
+}
+
+function dibujarBombasPickup() {
+  bombasPickup.forEach(p => {
+    ctx.save();
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 12;
+    ctx.font = '20px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('💣', p.x, p.y);
+    ctx.restore();
   });
 }
 
@@ -628,10 +723,12 @@ function update() {
   moverBalas();
   moverEnemigos();
   moverJefe();
+  moverBombasPickup();
   verificarColisiones();
   dibujarGas();
   dibujarParticulas();
   dibujarBalas();
+  dibujarBombasPickup();
   dibujarEnemigos();
   dibujarJefe();
   dibujarJugador();
@@ -749,8 +846,26 @@ function dibujarBalas() {
 function moverEnemigos() {
   enemigos.forEach(e => {
     const ang = Math.atan2(jugador.y - e.y, jugador.x - e.x);
-    e.x += Math.cos(ang) * e.vel;
-    e.y += Math.sin(ang) * e.vel;
+    let dx = Math.cos(ang) * e.vel;
+    let dy = Math.sin(ang) * e.vel;
+
+    // Separación: empuja levemente a los enemigos cercanos entre sí para que no se amontonen en fila
+    let sepX = 0, sepY = 0;
+    enemigos.forEach(otro => {
+      if (otro === e) return;
+      const ddx = e.x - otro.x;
+      const ddy = e.y - otro.y;
+      const dist = Math.sqrt(ddx * ddx + ddy * ddy);
+      const distMin = e.r + otro.r + 14;
+      if (dist > 0 && dist < distMin) {
+        const fuerza = (distMin - dist) / distMin;
+        sepX += (ddx / dist) * fuerza;
+        sepY += (ddy / dist) * fuerza;
+      }
+    });
+
+    e.x += dx + sepX * e.vel;
+    e.y += dy + sepY * e.vel;
   });
 }
 
@@ -909,6 +1024,7 @@ function verificarColisiones() {
         if (e.hp <= 0) {
           crearExplosion(e.x, e.y, '#ff4444');
           puntos += 10 * oleada;
+          intentarDropearBomba(e.x, e.y);
           actualizarHUD();
           return false;
         }
