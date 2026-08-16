@@ -323,12 +323,9 @@
   </div>
   <input class="input-dni" id="input-dni" type="number" placeholder="Ingresá tu DNI" maxlength="8"/>
   <button class="btn" onclick="iniciarJuego()">▶ JUGAR</button>
-  <button class="btn" style="margin-top:0.8rem;background:rgba(255,255,255,0.05);box-shadow:none;border:1px solid rgba(255,255,255,0.2)" onclick="mostrarRanking()">🏆 RANKING DEL DÍA</button>
-  <div style="margin-top:1.2rem;width:90%;max-width:340px;background:rgba(45,106,79,0.15);border:1px solid rgba(0,255,136,0.15);border-radius:12px;padding:0.9rem;text-align:center;">
-    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--verde-claro);margin-bottom:0.6rem;letter-spacing:2px;">📱 ENVIAR PUNTAJE DEL DÍA</div>
-    <input id="input-dni-envio" type="number" placeholder="Tu DNI" style="background:rgba(255,255,255,0.05);border:1px solid rgba(82,183,136,0.4);border-radius:8px;padding:0.45rem 0.8rem;font-family:'Orbitron',monospace;font-size:0.85rem;color:white;width:100%;text-align:center;outline:none;margin-bottom:0.6rem;"/>
-    <button onclick="enviarDesdePantallaInicio()" style="width:100%;background:linear-gradient(135deg,#128c7e,#25d366);color:white;border:none;border-radius:8px;padding:0.55rem;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:1px;">📲 ENVIAR MI MEJOR PUNTAJE</button>
-    <div id="msg-envio-inicio" style="margin-top:0.5rem;font-size:0.75rem;color:rgba(255,255,255,0.5);min-height:1rem;"></div>
+  <div style="margin-top:1.2rem;width:90%;max-width:340px;">
+    <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--verde-claro);margin-bottom:0.5rem;text-align:center;">🏆 RANKING DEL DÍA</div>
+    <div class="ranking-lista" id="inicio-ranking"></div>
   </div>
   <a href="index.html" style="margin-top:0.8rem;color:rgba(255,255,255,0.5);font-size:0.85rem;text-decoration:none;font-family:'Exo 2',sans-serif;">🛒 Volver a la tienda</a>
 
@@ -345,20 +342,11 @@
   <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--verde-claro);margin-bottom:0.5rem">🏆 RANKING DEL DÍA</div>
   <div class="ranking-lista" id="go-ranking"></div>
 
-  <div id="btn-whatsapp-container" style="margin-top:0.8rem;width:90%;max-width:400px;text-align:center"></div>
   <div class="btn-group">
     <button class="btn" onclick="reiniciar()">↺ JUGAR DE NUEVO</button>
     <button class="btn" style="background:rgba(255,255,255,0.05);box-shadow:none;border:1px solid rgba(255,255,255,0.2)" onclick="volverInicio()">⬅ INICIO</button>
     <a href="index.html" class="btn" style="background:rgba(255,255,255,0.05);box-shadow:none;border:1px solid rgba(255,255,255,0.2);text-decoration:none;display:flex;align-items:center;justify-content:center;">🛒 Ir a la tienda</a>
   </div>
-</div>
-
-<!-- PANTALLA RANKING -->
-<div class="pantalla oculta" id="pantalla-ranking">
-  <div class="logo-titulo" style="font-size:2rem">🏆 RANKING</div>
-  <div class="subtitulo" style="margin-bottom:1rem">TOP DEL DÍA</div>
-  <div class="ranking-lista" id="ranking-lista"></div>
-  <button class="btn" style="margin-top:1rem" onclick="volverInicio()">⬅ VOLVER</button>
 </div>
 
 <!-- HUD -->
@@ -389,6 +377,8 @@
 <script>
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwWS3Iv8V7P_Wly7cgWPSV-GXbWVfB8vvjjg3LVQia7D7dSM38jTCl7gZOD9LT8Ieh8/exec';
 
 // ===== ESTADO DEL JUEGO =====
 let estado = 'inicio';
@@ -430,6 +420,9 @@ resize();
 // ===== DETECCIÓN MÓVIL =====
 isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent) || window.innerWidth < 768;
 if (isMobile) document.getElementById('controles-movil').classList.add('visible');
+
+// Mostrar ranking en pantalla inicial al cargar
+mostrarRankingEnPantalla('inicio-ranking');
 
 // ===== TECLADO =====
 document.addEventListener('keydown', e => {
@@ -985,8 +978,8 @@ function terminarJuego(motivo) {
   cancelAnimationFrame(gameLoop);
   clearInterval(timerInterval);
 
-  // Guardar en ranking
-  guardarPuntaje(dni, puntos);
+  // Guardar en ranking (Google Sheets)
+  guardarPuntajeServidor(dni, puntos);
 
   document.getElementById('hud').style.display = 'none';
   document.getElementById('gas-warning').className = '';
@@ -1004,134 +997,34 @@ function terminarJuego(motivo) {
   document.getElementById('go-mensaje').textContent = msg;
 
   mostrarRankingEnPantalla('go-ranking');
-  renderizarBotonWhatsApp();
 }
 
-// ===== RANKING (localStorage) =====
-function yaEnvioHoy(dni) {
-  const fecha = obtenerFechaHoy();
-  const key = `zg_enviado_${fecha}_${dni}`;
-  return localStorage.getItem(key) === '1';
-}
-
-function marcarEnvioHoy(dni) {
-  const fecha = obtenerFechaHoy();
-  const key = `zg_enviado_${fecha}_${dni}`;
-  localStorage.setItem(key, '1');
-}
-
-function obtenerMejorPuntaje(dni) {
-  const fecha = obtenerFechaHoy();
-  const key = `zg_ranking_${fecha}`;
+// ===== RANKING (Google Sheets vía Apps Script) =====
+async function guardarPuntajeServidor(dniJugador, pts) {
   try {
-    const ranking = JSON.parse(localStorage.getItem(key)) || [];
-    const entrada = ranking.find(r => r.dni === dni);
-    return entrada ? entrada.pts : 0;
-  } catch(e) { return 0; }
-}
-
-function obtenerFechaHoy() {
-  const hoy = new Date();
-  return `${hoy.getFullYear()}-${hoy.getMonth()+1}-${hoy.getDate()}`;
-}
-
-function guardarPuntaje(dni, pts) {
-  const fecha = obtenerFechaHoy();
-  const key = `zg_ranking_${fecha}`;
-  let ranking = [];
-  try { ranking = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
-
-  const idx = ranking.findIndex(r => r.dni === dni);
-  if (idx >= 0) {
-    if (pts > ranking[idx].pts) ranking[idx].pts = pts;
-  } else {
-    ranking.push({ dni, pts });
-  }
-
-  ranking.sort((a,b) => b.pts - a.pts);
-  ranking = ranking.slice(0, 20);
-  localStorage.setItem(key, JSON.stringify(ranking));
-}
-
-function obtenerRanking() {
-  const fecha = obtenerFechaHoy();
-  const key = `zg_ranking_${fecha}`;
-  try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; }
-}
-
-function enviarDesdePantallaInicio() {
-  const WHATSAPP_ADMIN = "541133869762";
-  const dniEnvio = document.getElementById('input-dni-envio').value.trim();
-  const msgEl = document.getElementById('msg-envio-inicio');
-
-  if (!dniEnvio || dniEnvio.length < 7) {
-    msgEl.style.color = '#ff6666';
-    msgEl.textContent = '⚠️ Ingresá tu DNI válido';
-    return;
-  }
-
-  if (yaEnvioHoy(dniEnvio)) {
-    msgEl.style.color = '#ffd700';
-    msgEl.textContent = '✅ Ya enviaste tu puntaje hoy con ese DNI';
-    return;
-  }
-
-  const mejorPts = obtenerMejorPuntaje(dniEnvio);
-  if (mejorPts === 0) {
-    msgEl.style.color = '#ff6666';
-    msgEl.textContent = '⚠️ No hay puntaje registrado para ese DNI hoy';
-    return;
-  }
-
-  marcarEnvioHoy(dniEnvio);
-
-  const fecha = new Date().toLocaleDateString('es-AR');
-  const msg = `🎮 *ZG SHOOTER - Puntaje del día*\n📅 Fecha: ${fecha}\n🪪 DNI: ${dniEnvio}\n🏆 Puntaje: ${mejorPts} puntos`;
-  const url = `https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
-
-  msgEl.style.color = '#00ff88';
-  msgEl.textContent = '✅ ¡Puntaje enviado!';
-}
-
-function renderizarBotonWhatsApp() {
-  const WHATSAPP_ADMIN = "541133869762";
-  const container = document.getElementById('btn-whatsapp-container');
-  const mejorPts = obtenerMejorPuntaje(dni);
-
-  if (yaEnvioHoy(dni)) {
-    container.innerHTML = `
-      <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:0.8rem 1.2rem;color:rgba(255,255,255,0.5);font-size:0.85rem;font-family:'Exo 2',sans-serif;">
-        ✅ Ya enviaste tu puntaje hoy<br/>
-        <span style="color:var(--verde-neo);font-family:'Orbitron',monospace;font-size:1rem;">${mejorPts} pts</span> registrados
-      </div>`;
-  } else {
-    container.innerHTML = `
-      <button onclick="enviarPuntajeWhatsApp()" style="width:100%;background:linear-gradient(135deg,#128c7e,#25d366);color:white;border:none;border-radius:10px;padding:0.9rem;font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 20px rgba(37,211,102,0.4);">
-        📱 ENVIAR MI PUNTAJE<br/>
-        <span style="font-size:0.7rem;opacity:0.8">Solo podés enviar 1 vez por día</span>
-      </button>`;
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ tipo: 'puntaje_juego', dni: dniJugador, nombre: '', puntos: pts })
+    });
+  } catch (e) {
+    console.error('No se pudo guardar el puntaje:', e);
   }
 }
 
-function enviarPuntajeWhatsApp() {
-  const WHATSAPP_ADMIN = "541133869762";
-  const mejorPts = obtenerMejorPuntaje(dni);
-  if (yaEnvioHoy(dni)) return;
-
-  marcarEnvioHoy(dni);
-
-  const fecha = new Date().toLocaleDateString('es-AR');
-  const msg = `🎮 *ZG SHOOTER - Puntaje del día*\n📅 Fecha: ${fecha}\n🪪 DNI: ${dni}\n🏆 Puntaje: ${mejorPts} puntos\n⚔️ Oleada máxima: ${oleada}`;
-  const url = `https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
-
-  renderizarBotonWhatsApp();
+async function obtenerRankingServidor() {
+  try {
+    const resp = await fetch(`${APPS_SCRIPT_URL}?accion=ranking`);
+    return await resp.json();
+  } catch (e) {
+    console.error('No se pudo traer el ranking:', e);
+    return [];
+  }
 }
 
-function mostrarRankingEnPantalla(containerId) {
-  const ranking = obtenerRanking();
+async function mostrarRankingEnPantalla(containerId) {
   const container = document.getElementById(containerId);
+  container.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:1rem">Cargando...</div>';
+  const ranking = await obtenerRankingServidor();
   if (ranking.length === 0) {
     container.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:1rem">Sin puntajes hoy todavía</div>';
     return;
@@ -1144,12 +1037,6 @@ function mostrarRankingEnPantalla(containerId) {
       <span class="ranking-pts">${r.pts} pts</span>
     </div>
   `).join('');
-}
-
-function mostrarRanking() {
-  document.getElementById('pantalla-inicio').classList.add('oculta');
-  document.getElementById('pantalla-ranking').classList.remove('oculta');
-  mostrarRankingEnPantalla('ranking-lista');
 }
 
 // ===== NAVEGACIÓN =====
@@ -1165,11 +1052,11 @@ function reiniciar() {
 
 function volverInicio() {
   document.getElementById('pantalla-gameover').classList.add('oculta');
-  document.getElementById('pantalla-ranking').classList.add('oculta');
   document.getElementById('hud').style.display = 'none';
   document.getElementById('pantalla-inicio').classList.remove('oculta');
 
   estado = 'inicio';
+  mostrarRankingEnPantalla('inicio-ranking');
 }
 </script>
 </body>
