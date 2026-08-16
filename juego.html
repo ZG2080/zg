@@ -383,6 +383,7 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwWS3Iv8V7P_Wly
 // ===== ESTADO DEL JUEGO =====
 let estado = 'inicio';
 let dni = '';
+let nombreJugador = '';
 let puntos = 0;
 let vidas = 3;
 let oleada = 1;
@@ -462,9 +463,18 @@ joystickArea.addEventListener('touchend', () => {
 });
 
 // ===== INICIAR JUEGO =====
-function iniciarJuego() {
+async function iniciarJuego() {
   dni = document.getElementById('input-dni').value.trim();
   if (!dni || dni.length < 7) { alert('Por favor ingresá tu DNI válido'); return; }
+
+  nombreJugador = '';
+  try {
+    const resp = await fetch(`${APPS_SCRIPT_URL}?accion=cliente&dni=${encodeURIComponent(dni)}`);
+    const data = await resp.json();
+    if (data.encontrado) nombreJugador = data.nombre || '';
+  } catch (e) {
+    console.error('No se pudo obtener el nombre del cliente:', e);
+  }
 
   document.getElementById('pantalla-inicio').classList.add('oculta');
   document.getElementById('hud').style.display = 'flex';
@@ -973,17 +983,13 @@ function verificarOleada() {
 }
 
 // ===== FIN DEL JUEGO =====
-function terminarJuego(motivo) {
+async function terminarJuego(motivo) {
   estado = 'gameover';
   cancelAnimationFrame(gameLoop);
   clearInterval(timerInterval);
 
-  // Guardar en ranking (Google Sheets)
-  guardarPuntajeServidor(dni, puntos);
-
   document.getElementById('hud').style.display = 'none';
   document.getElementById('gas-warning').className = '';
-
 
   const pantalla = document.getElementById('pantalla-gameover');
   pantalla.classList.remove('oculta');
@@ -996,15 +1002,17 @@ function terminarJuego(motivo) {
   else if (motivo === 'muerte') msg = '💀 ¡Te quedaste sin vidas!';
   document.getElementById('go-mensaje').textContent = msg;
 
+  // Guardar en ranking (Google Sheets) y esperar a que termine antes de mostrarlo
+  await guardarPuntajeServidor(dni, nombreJugador, puntos);
   mostrarRankingEnPantalla('go-ranking');
 }
 
 // ===== RANKING (Google Sheets vía Apps Script) =====
-async function guardarPuntajeServidor(dniJugador, pts) {
+async function guardarPuntajeServidor(dniJugador, nombreJug, pts) {
   try {
     await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify({ tipo: 'puntaje_juego', dni: dniJugador, nombre: '', puntos: pts })
+      body: JSON.stringify({ tipo: 'puntaje_juego', dni: dniJugador, nombre: nombreJug, puntos: pts })
     });
   } catch (e) {
     console.error('No se pudo guardar el puntaje:', e);
