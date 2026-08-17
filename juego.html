@@ -248,6 +248,28 @@
       box-shadow: 0 0 15px rgba(82,183,136,0.5);
     }
 
+    #joystick-mira-area {
+      width: 100px;
+      height: 100px;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,80,80,0.35);
+      border-radius: 50%;
+      position: relative;
+      pointer-events: all;
+      touch-action: none;
+    }
+
+    #joystick-mira-thumb {
+      width: 42px;
+      height: 42px;
+      background: radial-gradient(circle, #ff8888, var(--rojo));
+      border-radius: 50%;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 15px rgba(255,80,80,0.5);
+    }
+
     #btn-disparar {
       width: 90px;
       height: 90px;
@@ -369,9 +391,9 @@
 <!-- CONTROLES MÓVIL -->
 <div id="controles-movil">
   <div id="joystick-area"><div id="joystick-thumb"></div></div>
-  <div style="display:flex; gap:0.6rem; pointer-events:all;">
-    <button id="btn-bomba" ontouchstart="usarBomba()" style="width:70px;height:70px;background:radial-gradient(circle, #ffe066, #ffb300);border:3px solid rgba(255,200,0,0.5);border-radius:50%;font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;color:#3a2a00;cursor:pointer;box-shadow:0 0 20px rgba(255,180,0,0.5);letter-spacing:1px;">💣<br/>BOMBA</button>
-    <button id="btn-disparar" ontouchstart="disparar()">🔫<br/>FUEGO</button>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:0.6rem; pointer-events:all;">
+    <button id="btn-bomba" ontouchstart="usarBomba()" style="width:56px;height:56px;background:radial-gradient(circle, #ffe066, #ffb300);border:3px solid rgba(255,200,0,0.5);border-radius:50%;font-family:'Orbitron',monospace;font-size:0.55rem;font-weight:700;color:#3a2a00;cursor:pointer;box-shadow:0 0 20px rgba(255,180,0,0.5);letter-spacing:1px;">💣</button>
+    <div id="joystick-mira-area"><div id="joystick-mira-thumb"></div></div>
   </div>
 </div>
 
@@ -411,6 +433,10 @@ const keys = {};
 let joystickDir = { x: 0, y: 0 };
 let joystickActivo = false;
 let joystickOrigen = { x: 0, y: 0 };
+let joystickMiraActivo = false;
+let joystickMiraOrigen = { x: 0, y: 0 };
+let miraAngMovil = 0;
+let disparoAutoInterval = null;
 let mousePos = { x: 0, y: 0 };
 canvas.addEventListener('mousemove', e => { mousePos.x = e.clientX; mousePos.y = e.clientY; });
 canvas.addEventListener('click', () => disparar());
@@ -467,6 +493,38 @@ joystickArea.addEventListener('touchend', () => {
   joystickActivo = false;
   joystickDir = { x: 0, y: 0 };
   joystickThumb.style.transform = 'translate(-50%, -50%)';
+});
+
+// ===== JOYSTICK DERECHO: apuntar y disparar en celular =====
+const joystickMiraArea = document.getElementById('joystick-mira-area');
+const joystickMiraThumb = document.getElementById('joystick-mira-thumb');
+
+joystickMiraArea.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const rect = joystickMiraArea.getBoundingClientRect();
+  joystickMiraOrigen = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
+  joystickMiraActivo = true;
+  if (!disparoAutoInterval) disparoAutoInterval = setInterval(() => { if (joystickMiraActivo) disparar(); }, 130);
+}, { passive: false });
+
+joystickMiraArea.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!joystickMiraActivo) return;
+  const t = e.touches[0];
+  const dx = t.clientX - joystickMiraOrigen.x;
+  const dy = t.clientY - joystickMiraOrigen.y;
+  const dist = Math.min(Math.sqrt(dx*dx+dy*dy), 35);
+  const ang = Math.atan2(dy, dx);
+  miraAngMovil = ang;
+  jugador.ang = ang;
+  joystickMiraThumb.style.transform = `translate(calc(-50% + ${Math.cos(ang)*dist}px), calc(-50% + ${Math.sin(ang)*dist}px))`;
+}, { passive: false });
+
+joystickMiraArea.addEventListener('touchend', () => {
+  joystickMiraActivo = false;
+  joystickMiraThumb.style.transform = 'translate(-50%, -50%)';
+  clearInterval(disparoAutoInterval);
+  disparoAutoInterval = null;
 });
 
 // ===== INICIAR JUEGO =====
@@ -777,9 +835,11 @@ function moverJugador() {
     jugador.y += dy * jugador.vel;
   }
 
-  // Apuntar: en PC siempre sigue al mouse (incluso mientras te movés); en celular sigue la dirección del joystick
+  // Apuntar: en PC siempre sigue al mouse (incluso mientras te movés); en celular sigue el joystick derecho, o la dirección de movimiento si no lo está usando
   if (!isMobile) {
     jugador.ang = Math.atan2(mousePos.y - jugador.y, mousePos.x - jugador.x);
+  } else if (joystickMiraActivo) {
+    jugador.ang = miraAngMovil;
   } else if (mag > 0) {
     jugador.ang = Math.atan2(dy, dx);
   }
