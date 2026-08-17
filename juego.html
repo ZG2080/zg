@@ -585,7 +585,7 @@ function resetJuego() {
     x: canvas.width / 2,
     y: canvas.height / 2,
     r: 14,
-    vel: 2.727,
+    vel: 2.727 * (isMobile ? 0.72 : 1),
     ang: 0,
     cooldown: 0,
     bombas: 10
