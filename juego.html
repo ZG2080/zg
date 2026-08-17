@@ -469,9 +469,13 @@ document.addEventListener('keyup', e => keys[e.code] = false);
 const joystickArea = document.getElementById('joystick-area');
 const joystickThumb = document.getElementById('joystick-thumb');
 
+let joystickIdMover = null;
+let joystickIdMira = null;
+
 joystickArea.addEventListener('touchstart', e => {
   e.preventDefault();
-  const t = e.touches[0];
+  const t = e.changedTouches[0];
+  joystickIdMover = t.identifier;
   const rect = joystickArea.getBoundingClientRect();
   joystickOrigen = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
   joystickActivo = true;
@@ -480,7 +484,8 @@ joystickArea.addEventListener('touchstart', e => {
 joystickArea.addEventListener('touchmove', e => {
   e.preventDefault();
   if (!joystickActivo) return;
-  const t = e.touches[0];
+  const t = Array.from(e.touches).find(t => t.identifier === joystickIdMover);
+  if (!t) return;
   const dx = t.clientX - joystickOrigen.x;
   const dy = t.clientY - joystickOrigen.y;
   const dist = Math.min(Math.sqrt(dx*dx+dy*dy), 40);
@@ -489,7 +494,10 @@ joystickArea.addEventListener('touchmove', e => {
   joystickThumb.style.transform = `translate(calc(-50% + ${Math.cos(ang)*dist}px), calc(-50% + ${Math.sin(ang)*dist}px))`;
 }, { passive: false });
 
-joystickArea.addEventListener('touchend', () => {
+joystickArea.addEventListener('touchend', e => {
+  const t = Array.from(e.changedTouches).find(t => t.identifier === joystickIdMover);
+  if (!t) return;
+  joystickIdMover = null;
   joystickActivo = false;
   joystickDir = { x: 0, y: 0 };
   joystickThumb.style.transform = 'translate(-50%, -50%)';
@@ -501,6 +509,8 @@ const joystickMiraThumb = document.getElementById('joystick-mira-thumb');
 
 joystickMiraArea.addEventListener('touchstart', e => {
   e.preventDefault();
+  const t = e.changedTouches[0];
+  joystickIdMira = t.identifier;
   const rect = joystickMiraArea.getBoundingClientRect();
   joystickMiraOrigen = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
   joystickMiraActivo = true;
@@ -510,7 +520,8 @@ joystickMiraArea.addEventListener('touchstart', e => {
 joystickMiraArea.addEventListener('touchmove', e => {
   e.preventDefault();
   if (!joystickMiraActivo) return;
-  const t = e.touches[0];
+  const t = Array.from(e.touches).find(t => t.identifier === joystickIdMira);
+  if (!t) return;
   const dx = t.clientX - joystickMiraOrigen.x;
   const dy = t.clientY - joystickMiraOrigen.y;
   const dist = Math.min(Math.sqrt(dx*dx+dy*dy), 35);
@@ -520,7 +531,10 @@ joystickMiraArea.addEventListener('touchmove', e => {
   joystickMiraThumb.style.transform = `translate(calc(-50% + ${Math.cos(ang)*dist}px), calc(-50% + ${Math.sin(ang)*dist}px))`;
 }, { passive: false });
 
-joystickMiraArea.addEventListener('touchend', () => {
+joystickMiraArea.addEventListener('touchend', e => {
+  const t = Array.from(e.changedTouches).find(t => t.identifier === joystickIdMira);
+  if (!t) return;
+  joystickIdMira = null;
   joystickMiraActivo = false;
   joystickMiraThumb.style.transform = 'translate(-50%, -50%)';
   clearInterval(disparoAutoInterval);
@@ -831,8 +845,10 @@ function moverJugador() {
   const mag = Math.sqrt(dx*dx + dy*dy);
   if (mag > 0) {
     dx /= mag; dy /= mag;
-    jugador.x += dx * jugador.vel;
-    jugador.y += dy * jugador.vel;
+    // Desde la ronda 10, el jugador gana +1% de velocidad acumulativo por ronda (igual que los enemigos)
+    const multiplicadorVelJugador = oleada > 10 ? Math.pow(1.01, oleada - 10) : 1;
+    jugador.x += dx * jugador.vel * multiplicadorVelJugador;
+    jugador.y += dy * jugador.vel * multiplicadorVelJugador;
   }
 
   // Apuntar: en PC siempre sigue al mouse (incluso mientras te movés); en celular sigue el joystick derecho, o la dirección de movimiento si no lo está usando
